@@ -68,7 +68,7 @@ public:
 	void SetPositionOutil(); //A coder !
 	void parser();//Parse, créer le tableau d'états machine et bientôt le code machine
 	void afficher();
-
+TabEtatMachine _TabEtatMachine;// Tableau des états machine après parsage
 private:
 
 	//************************************** Arguments ************************************
@@ -87,7 +87,7 @@ private:
 	void(Gcode::*instructionsG[100])(string line);//tableau de pointeur sur fonction pour instruction G
 	void(Gcode::*instructionsM[100])(string line);//tableau de pointeur sur fonction pour instruction M
 
-	TabEtatMachine _TabEtatMachine;// Tableau des états machine après parsage
+
 
 	//************************************** Méthodes *************************************
 

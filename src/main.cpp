@@ -1,5 +1,6 @@
 #include "../headers/Gcode.h"
-
+#include "../headers/Accelconverter.h"
+#include "../headers/Spicomm.h"
 
 int main()
 {
@@ -25,7 +26,14 @@ int main()
 
 	Prog1.parser();
 	cout << endl << endl << "position des axes : " << endl << endl;
-	Prog1.afficher();
+
+	Accel_converter conv;
+	conv.generate_tick_vector(Prog1._TabEtatMachine);
+	conv.afficher();
+	Spi_comm comm;
+	conv.sendVectors(comm);
+	comm.execute_fifo_list();
+	conv.printcsv();
 
 	return 0;
 }
