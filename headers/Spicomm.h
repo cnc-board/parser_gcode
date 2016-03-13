@@ -18,7 +18,7 @@
 #include <linux/spi/spidev.h>
 #include "Accelconverter.h"
 
-#define DEBUG_SPI
+//#define DEBUG_SPI
 
 class Spi_comm {
 public:
@@ -27,8 +27,9 @@ public:
 	void transmit_vector(Accel_vector & vect);
 	int fd;
 	void execute_fifo_list();
+	void execute_reset_off();
 private:
-	void transfert(uint8_t* tx, uint8_t* rx,uint32_t lenght);
+	void transfert(char* tx, char* rx,uint32_t lenght);
 };
 
 #endif /* SPICOMM_H_ */

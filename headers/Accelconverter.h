@@ -19,14 +19,14 @@ class Spi_comm;
 class Accel_converter {
 private:
 	TabAccelVector Accel_vectors;
-	uint32_t epoch_present=0;
-	int32_t mmToTick(double val);
+	uint64_t epoch_present=0;
+	int64_t mmToTick(double val);
 	void profileGenerator(DeplacementVector Dvect);
-	double convertFactorMmToTick=100.0;
-	int32_t accelDeccel=10;//TODO find a spot to store accel/deccel/vmax params
-	int32_t Vmax=100; //TODO create profileGen class
-	int32_t Ttick_to_acceldeccel=0;
-	int32_t Dtick_to_acceldeccel=0;
+	double convertFactorMmToTick=127.896942801*8796093022208.0;
+	int32_t accelDeccel=1548;//TODO find a spot to store accel/deccel/vmax params
+	uint64_t Vmax=0x4816f0068; //TODO create profileGen class
+	uint64_t Ttick_to_acceldeccel=0;
+	uint64_t Dtick_to_acceldeccel=0;
 
 public:
 	Accel_converter();
@@ -41,26 +41,26 @@ public:
 
 class DeplacementVector {
 public:
-	int32_t Dep_x;
-	int32_t Dep_y;
-	int32_t Dep_z;
-	int32_t Dep_a;
-	DeplacementVector(int32_t x,int32_t y,int32_t z,int32_t a);
-	void SetVector(int32_t x,int32_t y,int32_t z,int32_t a);
+	int64_t Dep_x;
+	int64_t Dep_y;
+	int64_t Dep_z;
+	int64_t Dep_a;
+	DeplacementVector(int64_t x,int64_t y,int64_t z,int64_t a);
+	void SetVector(int64_t x,int64_t y,int64_t z,int64_t a);
 private:
 };
 
 class Accel_vector {
 public:
-Accel_vector(int32_t Accel_x,int32_t Accel_y,int32_t Accel_z,int32_t Accel_a,uint32_t epoch_start,uint32_t epoch_stop);//,uint32_t epoch_stop);
+Accel_vector(int32_t Accel_x,int32_t Accel_y,int32_t Accel_z,int32_t Accel_a,uint64_t epoch_start,uint64_t epoch_stop);//,uint32_t epoch_stop);
 //private:
 	int32_t Accel_x;
 	int32_t Accel_y;
 	int32_t Accel_z;
 	int32_t Accel_a;
-	uint32_t epoch_start;
+	uint64_t epoch_start;
 	void printvect();
-	uint32_t epoch_stop;
+	uint64_t epoch_stop;
 };
 
 

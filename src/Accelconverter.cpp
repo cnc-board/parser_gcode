@@ -11,7 +11,7 @@ Accel_converter::Accel_converter() {
 	calculateAccelTick();
 }
 
-int32_t Accel_converter::mmToTick(double val) {
+int64_t Accel_converter::mmToTick(double val) {
 	return val*convertFactorMmToTick;
 }
 
@@ -19,9 +19,9 @@ Accel_converter::~Accel_converter() {
 	// TODO Auto-generated destructor stub
 }
 
-DeplacementVector::DeplacementVector(int32_t x,int32_t y,int32_t z,int32_t a):Dep_x(x),Dep_y(y),Dep_z(z),Dep_a(a){};
+DeplacementVector::DeplacementVector(int64_t x,int64_t y,int64_t z,int64_t a):Dep_x(x),Dep_y(y),Dep_z(z),Dep_a(a){};
 
-Accel_vector::Accel_vector(int32_t Accel_x,int32_t Accel_y,int32_t Accel_z,int32_t Accel_a,uint32_t epoch_start,uint32_t epoch_stop)//,uint32_t epoch_stop
+Accel_vector::Accel_vector(int32_t Accel_x,int32_t Accel_y,int32_t Accel_z,int32_t Accel_a,uint64_t epoch_start,uint64_t epoch_stop)//,uint32_t epoch_stop
 			:
 		Accel_x(Accel_x), Accel_y(Accel_y), Accel_z(Accel_z), Accel_a(Accel_a), epoch_start(
 				epoch_start),epoch_stop(epoch_stop) { //, epoch_stop(epoch_stop)
@@ -30,10 +30,10 @@ Accel_vector::Accel_vector(int32_t Accel_x,int32_t Accel_y,int32_t Accel_z,int32
 
 void Accel_converter::profileGenerator(DeplacementVector Dvect) {
 	typedef enum axes{x,y,z,a} biggest_axes;
-	int32_t bigestcoord=Dvect.Dep_x;
+	int64_t bigestcoord=Dvect.Dep_x;
 	biggest_axes baxes=x;
 	int32_t accel_x,accel_y,accel_z;
-	uint32_t epoch_begin,epoch_end_accel,epoch_end_conti,epoch_end;
+	uint64_t epoch_begin,epoch_end_accel,epoch_end_conti,epoch_end;
 	epoch_begin=epoch_present;
 	if(abs(Dvect.Dep_y)>abs(Dvect.Dep_x)){//todo : WRONG SELECT MAX
 		if(abs(Dvect.Dep_z)>abs(Dvect.Dep_y))
@@ -90,11 +90,11 @@ void Accel_converter::profileGenerator(DeplacementVector Dvect) {
 		}
 	else
 	{
-		uint32_t time_accel=0;
-		uint32_t dist_accel=0;
-		uint32_t speed=0;
+		uint64_t time_accel=0;
+		uint64_t dist_accel=0;
+		uint64_t speed=0;
 
-		uint32_t target=abs(bigestcoord)/2;
+		uint64_t target=abs(bigestcoord)/2;
 		/*for(time_accel=0;dist_accel<target;time_accel+=1) 			//todo calcul de i proper todo verif si movement < accelDeccel;
 		{
 			speed+=accelDeccel;
@@ -139,15 +139,16 @@ void Accel_converter::profileGenerator(DeplacementVector Dvect) {
 }
 
 void Accel_converter::calculateAccelTick() {
-	int32_t i;
-	/*for(i=0;i<=Vmax-accelDeccel;i+=accelDeccel)
+	/*int64_t i;
+
+	for(i=0;i<=Vmax-accelDeccel;i+=accelDeccel)
 		{
 			Ttick_to_acceldeccel++;
 			Dtick_to_acceldeccel+=i;
 		}*/
-	uint32_t time_accel=0;
-			uint32_t dist_accel=0;
-			uint32_t speed=0;
+	//uint64_t time_accel=0;
+			//uint64_t dist_accel=0;
+			uint64_t speed=0;
 			do
 			{
 				Ttick_to_acceldeccel++;
@@ -165,7 +166,7 @@ bool Accel_converter::generate_tick_vector(Gcode::TabEtatMachine & tabetat) {
 	DeplacementVector vect(0,0,0,0);
 	DeplacementVector prevvect(0,0,0,0);
 
-	Accel_vectors.push_back(new Accel_vector(0,0,0,0,0,epoch_present+=10));//empty begin vector
+	Accel_vectors.push_back(new Accel_vector(0,0,0,0,0,epoch_present+=1000));//empty begin vector
 
 	for(Gcode::TabEtatMachine::iterator it = tabetat.begin(); it != tabetat.end(); it++) {
 	    if((*it)->Deplacement==false) continue;
@@ -190,7 +191,8 @@ bool Accel_converter::generate_tick_vector(Gcode::TabEtatMachine & tabetat) {
 
 
 	}
-	Accel_vectors.push_back(new Accel_vector(0,0,0,0,epoch_present,epoch_present+10));//empty end vector
+	Accel_vectors.push_back(new Accel_vector(0,0,0,0,epoch_present,epoch_present+1000));//empty end vector
+	Accel_vectors.push_back(new Accel_vector(0,0,0,0,epoch_present+1000,epoch_present+2000));//empty end vector
 
 	return false;
 }
@@ -209,7 +211,7 @@ void Accel_converter::afficher()
 
 }
 
-void DeplacementVector::SetVector(int32_t x, int32_t y, int32_t z, int32_t a) {
+void DeplacementVector::SetVector(int64_t x, int64_t y, int64_t z, int64_t a) {
 	Dep_x=x;
 	Dep_y=y;
 	Dep_z=z;

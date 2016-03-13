@@ -6,14 +6,15 @@
  */
 #include "../headers/Spicomm.h"
 
+#include <string.h>
 
 Spi_comm::Spi_comm() {
+	cout << "spi_const" << endl;
+#ifndef DEBUG_SPI
 	int ret;
 	static uint8_t mode = 3;
 	static uint8_t bits = 8;
 	static uint32_t speed = 1000000;
-	cout << "spi_const" << endl;
-#ifndef DEBUG_SPI
 	fd = open("/dev/spidev32766.2", O_RDWR);
 	if (fd < 0) {
 		cerr << "can't open device" << endl;
@@ -70,54 +71,71 @@ Spi_comm::Spi_comm() {
 
 Spi_comm::~Spi_comm() {
 	cout << "spicomm dest" << endl;
-	//close(fd);
+	close(fd);
 }
 
 void Spi_comm::transmit_vector(Accel_vector& vect) {
-	uint8_t tx[1+2+2+2+2+4];
-	uint8_t rx[1+2+2+2+2+4];
+	char tx[1+2+2+2+2+4];
+	char rx[1+2+2+2+2+4];
 	tx[0]=0xA0;
 
-	tx[1]=(vect.Accel_x>>8)&0xFF;
-	tx[2]=vect.Accel_x&0xFF;
-	tx[3]=(vect.Accel_y>>8)&0xFF;
-	tx[4]=vect.Accel_y&0xFF;
-	tx[5]=(vect.Accel_z>>8)&0xFF;
-	tx[6]=vect.Accel_z&0xFF;
-	tx[7]=(vect.Accel_a>>8)&0xFF;
-	tx[8]=vect.Accel_a&0xFF;
+	tx[1]=vect.Accel_x&0xFF;
+	tx[2]=(vect.Accel_x>>8)&0xFF;
+	tx[3]=vect.Accel_y&0xFF;
+	tx[4]=(vect.Accel_y>>8)&0xFF;
+	tx[5]=vect.Accel_z&0xFF;
+	tx[6]=(vect.Accel_z>>8)&0xFF;
+	tx[7]=vect.Accel_a&0xFF;
+	tx[8]=(vect.Accel_a>>8)&0xFF;
 
 
-	tx[9]=(vect.epoch_stop>>24)&0xFF;
-	tx[10]=(vect.epoch_stop>>16)&0xFF;
-	tx[11]=(vect.epoch_stop>>8)&0xFF;
-	tx[12]=vect.epoch_stop&0xFF;
+	tx[9]=vect.epoch_stop&0xFF;
+	tx[10]=(vect.epoch_stop>>8)&0xFF;
+	tx[11]=(vect.epoch_stop>>16)&0xFF;
+	tx[12]=(vect.epoch_stop>>24)&0xFF;
 	transfert(tx,rx,1+2+2+2+2+4);
 
 
 }
 
 void Spi_comm::execute_fifo_list() {
-	uint8_t tx[1];
-		uint8_t rx[1];
+	char tx[1];
+		char rx[1];
 		tx[0]=0xB2;
 		transfert(tx,rx,1);
 }
 
-void Spi_comm::transfert(uint8_t* tx, uint8_t* rx,uint32_t lenght) {
+void Spi_comm::execute_reset_off() {
+	char tx[1];
+		char rx[1];
+		tx[0]=0xB3;
+		transfert(tx,rx,1);
+}
 
-	struct spi_ioc_transfer tr;
-	tr.tx_buf=(__u64)tx;
-	tr.rx_buf=(__u64)rx;
-	tr.len=lenght;
-#ifdef DEBUG_SPI
-	for (uint32_t ret = 0; ret < lenght; ret++) {
+void Spi_comm::transfert(char* tx, char* rx,uint32_t lenght) {
+
+	struct spi_ioc_transfer tr[lenght];
+	//memset(&tr, 0, sizeof(tr));
+	for (int i = 0; i <lenght; i++) {
+		memset(&(tr[i]), 0, sizeof(tr[i]));
+		tr[i].tx_buf=(unsigned long)(&(tx[i]));
+		tr[i].rx_buf=(unsigned long)(&(rx[i]));
+		tr[i].len=1;
+		//tr[i].speed_hz=1000000;
+		//tr[i].delay_usecs=0;
+		//tr[i].bits_per_word=8;
+		//tr[i].cs_change=1;
+
+	}
+	//cout << " lenght : " << tr.len << endl;
+//#ifdef DEBUG_SPI
+/*	for (uint32_t ret = 0; ret < lenght; ret++) {
 			if (!(ret % 6))
 				puts("");
 			printf("%.2X ", tx[ret]);
 		}
-	cout << endl;
-#else
+	cout << endl;*/
+//#else
 	//tr.tx_buf=(__u64)tx;
 
 	/*struct spi_ioc_transfer tr = {
@@ -133,11 +151,15 @@ void Spi_comm::transfert(uint8_t* tx, uint8_t* rx,uint32_t lenght) {
 //			pad : NULL
 	};*/
 
-	int ret = ioctl(fd, SPI_IOC_MESSAGE(1), &tr);
-		if (ret == 1)
-			exit(-2);
+	int ret = ioctl(fd, SPI_IOC_MESSAGE(lenght), tr);
+		/*if (ret == 1)
+			exit(-2);*/
+		perror("spi error");
 
-#endif
+		cout << "ret : " << ret << endl;
+
+
+//#endif
 
 
 }

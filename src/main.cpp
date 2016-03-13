@@ -31,9 +31,10 @@ int main()
 	conv.generate_tick_vector(Prog1._TabEtatMachine);
 	conv.afficher();
 	Spi_comm comm;
+	comm.execute_reset_off();
 	conv.sendVectors(comm);
 	comm.execute_fifo_list();
-	conv.printcsv();
+	//conv.printcsv();
 
 	return 0;
 }
