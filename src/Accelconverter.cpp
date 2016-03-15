@@ -51,7 +51,7 @@ void Accel_converter::profileGenerator(DeplacementVector Dvect) {
 		baxes=z;
 		bigestcoord=Dvect.Dep_z;
 	}
-	if(abs(bigestcoord)>Dtick_to_acceldeccel*2)
+	if((uint64_t)abs(bigestcoord)>Dtick_to_acceldeccel*2)
 		{
 			epoch_end_accel=epoch_present+=Ttick_to_acceldeccel;
 			switch(baxes)
@@ -165,9 +165,8 @@ bool Accel_converter::generate_tick_vector(Gcode::TabEtatMachine & tabetat) {
 	bool first=true;
 	DeplacementVector vect(0,0,0,0);
 	DeplacementVector prevvect(0,0,0,0);
-
+	unsigned int iter=0;
 	Accel_vectors.push_back(new Accel_vector(0,0,0,0,0,epoch_present+=1000));//empty begin vector
-
 	for(Gcode::TabEtatMachine::iterator it = tabetat.begin(); it != tabetat.end(); it++) {
 	    if((*it)->Deplacement==false) continue;
 	    if(first)
@@ -184,7 +183,11 @@ bool Accel_converter::generate_tick_vector(Gcode::TabEtatMachine & tabetat) {
 					mmToTick((*it)->PosOutil_Z),mmToTick((*it)->PosOutil_A));
 	    profileGenerator(vect);
 	    first=false;
-
+	    iter++;
+	    if(iter%(tabetat.size()/10)==0)
+	    {
+	    	cout << "generated vectors : " << (iter*100)/tabetat.size() << "%" << endl;
+	    }
 	    //Phase accel
 	    //Phase maintien
 	    //Phase deccel
@@ -231,7 +234,26 @@ void Accel_converter::printcsv() {
 }
 
 void Accel_converter::sendVectors(Spi_comm & comm) {
+	int i=0;
+	char first=1;
 	for(TabAccelVector::iterator it = Accel_vectors.begin(); it != Accel_vectors.end(); it++) {
 		comm.transmit_vector(*(*it));
+		i++;
+		if(i>5)
+		{
+			i=0;
+			while(comm.get_fifo_fill()>70)
+			{
+				if(first==1)
+				{
+					comm.execute_fifo_list();
+					first=0;
+				}
+				cout << "FIFO fill : " << comm.get_fifo_fill() << "%" <<endl;
+				usleep(250000);
+			}
+			cout << "FIFO fill : " << comm.get_fifo_fill() << "%" <<endl;
+		}
 	}
+	cout << "End transmit" << endl;
 }

@@ -59,8 +59,8 @@ Accel_vector(int32_t Accel_x,int32_t Accel_y,int32_t Accel_z,int32_t Accel_a,uin
 	int32_t Accel_z;
 	int32_t Accel_a;
 	uint64_t epoch_start;
-	void printvect();
 	uint64_t epoch_stop;
+	void printvect();
 };
 
 

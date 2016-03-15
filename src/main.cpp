@@ -33,7 +33,6 @@ int main()
 	Spi_comm comm;
 	comm.execute_reset_off();
 	conv.sendVectors(comm);
-	comm.execute_fifo_list();
 	//conv.printcsv();
 
 	return 0;

@@ -116,7 +116,7 @@ void Spi_comm::transfert(char* tx, char* rx,uint32_t lenght) {
 
 	struct spi_ioc_transfer tr[lenght];
 	//memset(&tr, 0, sizeof(tr));
-	for (int i = 0; i <lenght; i++) {
+	for (uint32_t i = 0; i <lenght; i++) {
 		memset(&(tr[i]), 0, sizeof(tr[i]));
 		tr[i].tx_buf=(unsigned long)(&(tx[i]));
 		tr[i].rx_buf=(unsigned long)(&(rx[i]));
@@ -152,14 +152,24 @@ void Spi_comm::transfert(char* tx, char* rx,uint32_t lenght) {
 	};*/
 
 	int ret = ioctl(fd, SPI_IOC_MESSAGE(lenght), tr);
-		/*if (ret == 1)
-			exit(-2);*/
-		perror("spi error");
+		if (ret < 0)
+		{
+			perror("spi error");
+			cout << "ret : " << ret << endl;
+			exit(-2);
+		}
 
-		cout << "ret : " << ret << endl;
 
 
 //#endif
 
 
+}
+
+unsigned int Spi_comm::get_fifo_fill() {
+	char tx[2];
+	char rx[2];
+	tx[0]=0xA1;
+	transfert(tx,rx,2);
+	return (rx[1]*100)/255;
 }
