@@ -118,41 +118,12 @@ void Spi_comm::execute_reset_off() {
 void Spi_comm::transfert(char* tx, char* rx,uint32_t lenght) {
 
 	struct spi_ioc_transfer tr[lenght];
-	//memset(&tr, 0, sizeof(tr));
 	for (uint32_t i = 0; i <lenght; i++) {
 		memset(&(tr[i]), 0, sizeof(tr[i]));
 		tr[i].tx_buf=(unsigned long)(&(tx[i]));
 		tr[i].rx_buf=(unsigned long)(&(rx[i]));
 		tr[i].len=1;
-		//tr[i].speed_hz=1000000;
-		//tr[i].delay_usecs=0;
-		//tr[i].bits_per_word=8;
-		//tr[i].cs_change=1;
-
 	}
-	//cout << " lenght : " << tr.len << endl;
-//#ifdef DEBUG_SPI
-/*	for (uint32_t ret = 0; ret < lenght; ret++) {
-			if (!(ret % 6))
-				puts("");
-			printf("%.2X ", tx[ret]);
-		}
-	cout << endl;*/
-//#else
-	//tr.tx_buf=(__u64)tx;
-
-	/*struct spi_ioc_transfer tr = {
-			tx_buf : (__u64)tx,
-			rx_buf : (__u64)rx,
-			len : lenght,
-			speed_hz : 0,
-			delay_usecs : 0,
-			bits_per_word : 0,
-//			cs_change : NULL,
-//			tx_nbits : NULL,
-//			rx_nbits : NULL,
-//			pad : NULL
-	};*/
 
 	int ret = ioctl(fd, SPI_IOC_MESSAGE(lenght), tr);
 		if (ret < 0)
@@ -161,12 +132,6 @@ void Spi_comm::transfert(char* tx, char* rx,uint32_t lenght) {
 			cout << "ret : " << ret << endl;
 			exit(-2);
 		}
-
-
-
-//#endif
-
-
 }
 
 unsigned int Spi_comm::get_fifo_fill() {
