@@ -74,7 +74,7 @@ void Gcode::parser()
 {
 	string line;
 	errors err = NoErr;
-	ifstream fichier("test.txt", ios::in);
+	ifstream fichier(_FileName, ios::in);
 	int Nb = 0;
 	int Nline = 0;
 
@@ -356,12 +356,6 @@ void Gcode::Deplacement_G00_G01(string line, bool G00)
 
 	if (!(testX || testY || testZ || testA))
 		throw Err(MissingParam);
-
-	std::cout << "Deplacement vitesse rapide   : ";
-	std::cout << "  X : " << Xvalue << "mm";
-	std::cout << "  Y : " << Yvalue << "mm";
-	std::cout << "  Z : " << Zvalue << "mm";
-	std::cout << "  A : " << Avalue << "mm" << endl;
 
 	//Modification de la position de l'outil
 	if (EtatMachine->ModeDistance == Absolues)

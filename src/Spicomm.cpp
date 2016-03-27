@@ -75,8 +75,8 @@ Spi_comm::~Spi_comm() {
 }
 
 void Spi_comm::transmit_vector(Accel_vector& vect) {
-	char tx[1+2+2+2+2+4];
-	char rx[1+2+2+2+2+4];
+	char tx[1+2+2+2+2+6];
+	char rx[1+2+2+2+2+6];
 	tx[0]=0xA0;
 
 	tx[1]=vect.Accel_x&0xFF;
@@ -93,7 +93,10 @@ void Spi_comm::transmit_vector(Accel_vector& vect) {
 	tx[10]=(vect.epoch_stop>>8)&0xFF;
 	tx[11]=(vect.epoch_stop>>16)&0xFF;
 	tx[12]=(vect.epoch_stop>>24)&0xFF;
-	transfert(tx,rx,1+2+2+2+2+4);
+	tx[13]=(vect.epoch_stop>>32)&0xFF;
+	tx[14]=(vect.epoch_stop>>40)&0xFF;
+
+	transfert(tx,rx,1+2+2+2+2+6);
 
 
 }

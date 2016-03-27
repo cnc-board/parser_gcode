@@ -2,7 +2,7 @@
 #include "../headers/Accelconverter.h"
 #include "../headers/Spicomm.h"
 
-int main()
+int main(int argc, char **argv)
 {
 	InitMachine EtatInit;
 
@@ -22,18 +22,16 @@ int main()
 	EtatInit.V_Rapide_Defaut_Y = 120;
 	EtatInit.V_Rapide_Defaut_Z = 120;
 
-	Gcode Prog1 = Gcode("test.txt", EtatInit);
+	Gcode Prog1 = Gcode(argv[1], EtatInit);
 
 	Prog1.parser();
-	cout << endl << endl << "position des axes : " << endl << endl;
 
 	Accel_converter conv;
 	conv.generate_tick_vector(Prog1._TabEtatMachine);
-	conv.afficher();
+	cout << "Cycle time : " << (conv.Accel_vectors[conv.Accel_vectors.size()-1]->epoch_stop)/(25000000*60)<< " minutes" << endl;
 	Spi_comm comm;
 	comm.execute_reset_off();
 	conv.sendVectors(comm);
-	//conv.printcsv();
 
 	return 0;
 }
