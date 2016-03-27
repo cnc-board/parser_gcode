@@ -8,8 +8,7 @@
 #include "../headers/SignalHandler.h"
 
 SignalHandler::SignalHandler() {
-	// TODO Auto-generated constructor stub
-
+	signal((int) SIGINT, SignalHandler::exitSignalHandler);
 }
 
 SignalHandler::~SignalHandler() {
@@ -17,5 +16,7 @@ SignalHandler::~SignalHandler() {
 }
 
 void SignalHandler::exitSignalHandler(int _ignored) {
+	std::cerr << "emergency exit ..." << std::endl;
 
+	exit(-1);
 }

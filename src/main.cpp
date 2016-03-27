@@ -1,9 +1,10 @@
 #include "../headers/Gcode.h"
 #include "../headers/Accelconverter.h"
 #include "../headers/Spicomm.h"
-
+#include "../headers/SignalHandler.h"
 int main(int argc, char **argv)
 {
+	SignalHandler sighand;
 	InitMachine EtatInit;
 
 	EtatInit.ModeDistance = Absolues;

@@ -8,7 +8,7 @@
 #ifndef SIGNALHANDLER_H_
 #define SIGNALHANDLER_H_
 #include <signal.h>
-
+#include <iostream>
 
 class SignalHandler {
 public:
