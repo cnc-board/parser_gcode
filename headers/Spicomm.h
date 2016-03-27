@@ -22,7 +22,7 @@
 
 class Spi_comm {
 public:
-	Spi_comm();
+	Spi_comm(bool simulate);
 	virtual ~Spi_comm();
 	void transmit_vector(Accel_vector & vect);
 	int fd;
@@ -31,6 +31,7 @@ public:
 	void send_reset_FPGA();
 	unsigned int get_fifo_fill();
 private:
+	bool Simulation_mode=false;
 	void transfert(char* tx, char* rx,uint32_t lenght);
 };
 

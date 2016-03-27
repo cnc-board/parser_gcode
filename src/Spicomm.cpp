@@ -8,70 +8,72 @@
 
 #include <string.h>
 
-Spi_comm::Spi_comm() {
-	cout << "spi_const" << endl;
-#ifndef DEBUG_SPI
+Spi_comm::Spi_comm(bool simulate):Simulation_mode(simulate) {
 	int ret;
 	static uint8_t mode = 3;
 	static uint8_t bits = 8;
 	static uint32_t speed = 1000000;
-	fd = open("/dev/spidev32766.2", O_RDWR);
-	if (fd < 0) {
-		cerr << "can't open device" << endl;
-		exit(-1);
-	}
+	cout << "Opening SPI ... " << flush;
+	if(Simulation_mode==false)
+	{
+		fd = open("/dev/spidev32766.2", O_RDWR);
+		if (fd < 0) {
+			cerr << "can't open device" << endl;
+			exit(-1);
+		}
 
-	/*
-	 * spi mode
-	 */
-	ret = ioctl(fd, SPI_IOC_WR_MODE, &mode);
-	if (ret == -1) {
-		cerr << "can't set spi mode" << endl;
-		exit(-1);
-	}
+		/*
+		 * spi mode
+		 */
+		ret = ioctl(fd, SPI_IOC_WR_MODE, &mode);
+		if (ret == -1) {
+			cerr << "can't set spi mode" << endl;
+			exit(-1);
+		}
 
-	ret = ioctl(fd, SPI_IOC_RD_MODE, &mode);
-	if (ret == -1) {
-		cerr << "can't get spi mode" << endl;
-		exit(-1);
-	}
+		ret = ioctl(fd, SPI_IOC_RD_MODE, &mode);
+		if (ret == -1) {
+			cerr << "can't get spi mode" << endl;
+			exit(-1);
+		}
 
-	/*
-	 * bits per word
-	 */
-	ret = ioctl(fd, SPI_IOC_WR_BITS_PER_WORD, &bits);
-	if (ret == -1) {
-		cerr << "can't set bits per word" << endl;
-		exit(-1);
-	}
+		/*
+		 * bits per word
+		 */
+		ret = ioctl(fd, SPI_IOC_WR_BITS_PER_WORD, &bits);
+		if (ret == -1) {
+			cerr << "can't set bits per word" << endl;
+			exit(-1);
+		}
 
-	ret = ioctl(fd, SPI_IOC_RD_BITS_PER_WORD, &bits);
-	if (ret == -1) {
-		cerr << "can't get bits per word" << endl;
-		exit(-1);
-	}
+		ret = ioctl(fd, SPI_IOC_RD_BITS_PER_WORD, &bits);
+		if (ret == -1) {
+			cerr << "can't get bits per word" << endl;
+			exit(-1);
+		}
 
-	/*
-	 * max speed hz
-	 */
-	ret = ioctl(fd, SPI_IOC_WR_MAX_SPEED_HZ, &speed);
-	if (ret == -1) {
-		cerr << "can't set max speed hz" << endl;
-		exit(-1);
-	}
+		/*
+		 * max speed hz
+		 */
+		ret = ioctl(fd, SPI_IOC_WR_MAX_SPEED_HZ, &speed);
+		if (ret == -1) {
+			cerr << "can't set max speed hz" << endl;
+			exit(-1);
+		}
 
-	ret = ioctl(fd, SPI_IOC_RD_MAX_SPEED_HZ, &speed);
-	if (ret == -1) {
-		cerr << "can't get max speed hz" << endl;
-		exit(-1);
+		ret = ioctl(fd, SPI_IOC_RD_MAX_SPEED_HZ, &speed);
+		if (ret == -1) {
+			cerr << "can't get max speed hz" << endl;
+			exit(-1);
+		}
 	}
-#endif
-
+	cout << "Done" << endl;
 }
 
 Spi_comm::~Spi_comm() {
-	cout << "spicomm dest" << endl;
+	cout << "Closing SPI ... " << flush;
 	close(fd);
+	cout << "Done" << endl;
 }
 
 void Spi_comm::transmit_vector(Accel_vector& vect) {
@@ -125,26 +127,34 @@ void Spi_comm::send_reset_FPGA() {
 void Spi_comm::transfert(char* tx, char* rx,uint32_t lenght) {
 
 	struct spi_ioc_transfer tr[lenght];
-	for (uint32_t i = 0; i <lenght; i++) {
-		memset(&(tr[i]), 0, sizeof(tr[i]));
-		tr[i].tx_buf=(unsigned long)(&(tx[i]));
-		tr[i].rx_buf=(unsigned long)(&(rx[i]));
-		tr[i].len=1;
-	}
-
-	int ret = ioctl(fd, SPI_IOC_MESSAGE(lenght), tr);
-		if (ret < 0)
-		{
-			perror("spi error");
-			cout << "ret : " << ret << endl;
-			exit(-2);
+	if(Simulation_mode==false)
+	{
+		for (uint32_t i = 0; i <lenght; i++) {
+			memset(&(tr[i]), 0, sizeof(tr[i]));
+			tr[i].tx_buf=(unsigned long)(&(tx[i]));
+			tr[i].rx_buf=(unsigned long)(&(rx[i]));
+			tr[i].len=1;
 		}
+
+		int ret = ioctl(fd, SPI_IOC_MESSAGE(lenght), tr);
+			if (ret < 0)
+			{
+				perror("spi error");
+				cout << "ret : " << ret << endl;
+				exit(-2);
+			}
+	}
 }
 
 unsigned int Spi_comm::get_fifo_fill() {
 	char tx[2];
 	char rx[2];
+	unsigned int fill_val=0;
 	tx[0]=0xA1;
 	transfert(tx,rx,2);
-	return (rx[1]*100)/255;
+	if(Simulation_mode==false)
+	{
+		fill_val=(rx[1]*100)/255;
+	}
+	return fill_val;
 }

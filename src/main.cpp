@@ -4,7 +4,7 @@
 
 int main(int argc, char **argv)
 {
-	Spi_comm comm;
+	Spi_comm comm(true);
 	InitMachine EtatInit;
 
 	EtatInit.ModeDistance = Absolues;
