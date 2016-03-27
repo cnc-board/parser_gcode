@@ -4,6 +4,8 @@
 #include "../headers/SignalHandler.h"
 int main(int argc, char **argv)
 {
+
+	Spi_comm comm(true);
 	SignalHandler sighand;
 	InitMachine EtatInit;
 
@@ -30,7 +32,6 @@ int main(int argc, char **argv)
 	Accel_converter conv;
 	conv.generate_tick_vector(Prog1._TabEtatMachine);
 	cout << "Cycle time : " << (conv.Accel_vectors[conv.Accel_vectors.size()-1]->epoch_stop)/(25000000*60)<< " minutes" << endl;
-	Spi_comm comm;
 	comm.execute_reset_off();
 	conv.sendVectors(comm);
 

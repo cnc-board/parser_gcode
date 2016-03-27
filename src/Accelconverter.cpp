@@ -182,19 +182,11 @@ bool Accel_converter::generate_tick_vector(Gcode::TabEtatMachine & tabetat) {
 	    profileGenerator(vect);
 	    first=false;
 	    iter++;
-	    if(iter%(tabetat.size()/10)==0)
-	    {
-	    	cout << "generated vectors : " << (iter*100)/tabetat.size() << "%" << endl;
-	    }
-	    //Phase accel
-	    //Phase maintien
-	    //Phase deccel
-
-
+    	cout << "\rgenerated vectors : " << (int)((float)((iter*100.0)/tabetat.size())) << "%" << flush;
 	}
 	Accel_vectors.push_back(new Accel_vector(0,0,0,0,epoch_present,epoch_present+1000));//empty end vector
 	Accel_vectors.push_back(new Accel_vector(0,0,0,0,epoch_present+1000,epoch_present+2000));//empty end vector
-
+	cout << " Done" << endl;
 	return false;
 }
 
