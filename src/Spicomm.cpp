@@ -103,16 +103,23 @@ void Spi_comm::transmit_vector(Accel_vector& vect) {
 
 void Spi_comm::execute_fifo_list() {
 	char tx[1];
-		char rx[1];
-		tx[0]=0xB2;
-		transfert(tx,rx,1);
+	char rx[1];
+	tx[0]=0xB2;
+	transfert(tx,rx,1);
 }
 
 void Spi_comm::execute_reset_off() {
 	char tx[1];
-		char rx[1];
-		tx[0]=0xB3;
-		transfert(tx,rx,1);
+	char rx[1];
+	tx[0]=0xB3;
+	transfert(tx,rx,1);
+}
+
+void Spi_comm::send_reset_FPGA() {
+	char tx[1];
+	char rx[1];
+	tx[0]=0xB1;
+	transfert(tx,rx,1);
 }
 
 void Spi_comm::transfert(char* tx, char* rx,uint32_t lenght) {

@@ -28,6 +28,7 @@ public:
 	int fd;
 	void execute_fifo_list();
 	void execute_reset_off();
+	void send_reset_FPGA();
 	unsigned int get_fifo_fill();
 private:
 	void transfert(char* tx, char* rx,uint32_t lenght);
