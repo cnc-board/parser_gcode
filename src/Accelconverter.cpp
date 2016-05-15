@@ -7,12 +7,28 @@
 
 #include "../headers/Accelconverter.h"
 #include "../headers/Spicomm.h"
-Accel_converter::Accel_converter() {
-	calculateAccelTick();
+Accel_converter::Accel_converter(double convertFactorMmToTick_X, double convertFactorMmToTick_Y,
+								double convertFactorMmToTick_Z, double convertFactorMmToTick_A) :
+								_convertFactorMmToTick_X(convertFactorMmToTick_X), _convertFactorMmToTick_Y(convertFactorMmToTick_Y),
+								_convertFactorMmToTick_Z(convertFactorMmToTick_Z), _convertFactorMmToTick_A(convertFactorMmToTick_A)
+{
+
 }
 
-int64_t Accel_converter::mmToTick(double val) {
-	return val*convertFactorMmToTick;
+int64_t Accel_converter::mmToTickX(double val) {
+	return val*_convertFactorMmToTick_X;
+}
+
+int64_t Accel_converter::mmToTickY(double val) {
+	return val*_convertFactorMmToTick_Y;
+}
+
+int64_t Accel_converter::mmToTickZ(double val) {
+	return val*_convertFactorMmToTick_Z;
+}
+
+int64_t Accel_converter::mmToTickA(double val) {
+	return val*_convertFactorMmToTick_A;
 }
 
 Accel_converter::~Accel_converter() {
@@ -136,28 +152,7 @@ void Accel_converter::profileGenerator(Movement_Vector Dvect) {
 
 }
 
-void Accel_converter::calculateAccelTick() {
-	/*int64_t i;
 
-	for(i=0;i<=Vmax-accelDeccel;i+=accelDeccel)
-		{
-			Ttick_to_acceldeccel++;
-			Dtick_to_acceldeccel+=i;
-		}*/
-	//uint64_t time_accel=0;
-			//uint64_t dist_accel=0;
-			uint64_t speed=0;
-			do
-			{
-				Ttick_to_acceldeccel++;
-				speed+=accelDeccel;
-				Dtick_to_acceldeccel+=speed;
-			} while (speed<Vmax);
-		if(speed!=Vmax)Vmax=speed;
-		cout << "Vmax is " << Vmax << endl;
-		cout << "TAccelTick is " << Ttick_to_acceldeccel << endl;
-		cout << "DAccelTick is " << Dtick_to_acceldeccel << endl;
-}
 
 bool Accel_converter::generate_tick_vector(Gcode::TabEtatMachine & tabetat) {
 	bool first=true;
@@ -169,16 +164,16 @@ bool Accel_converter::generate_tick_vector(Gcode::TabEtatMachine & tabetat) {
 	    if((*it)->Deplacement==false) continue;
 	    if(first)
 	    {
-	    	vect.SetVector(	mmToTick((*it)->PosOutil_X),mmToTick((*it)->PosOutil_Y),
-	    					mmToTick((*it)->PosOutil_Z),mmToTick((*it)->PosOutil_A));
+	    	vect.SetVector(	mmToTickX((*it)->PosOutil_X),mmToTickY((*it)->PosOutil_Y),
+	    					mmToTickZ((*it)->PosOutil_Z),mmToTickA((*it)->PosOutil_A));
 	    }
 	    else
 	    {
-	    	vect.SetVector(	mmToTick((*it)->PosOutil_X)-prevvect.Dep_x,mmToTick((*it)->PosOutil_Y)-prevvect.Dep_y,
-	    		    		mmToTick((*it)->PosOutil_Z)-prevvect.Dep_z,mmToTick((*it)->PosOutil_A)-prevvect.Dep_a);
+	    	vect.SetVector(	mmToTickX((*it)->PosOutil_X)-prevvect.Dep_x,mmToTickY((*it)->PosOutil_Y)-prevvect.Dep_y,
+	    		    		mmToTickZ((*it)->PosOutil_Z)-prevvect.Dep_z,mmToTickA((*it)->PosOutil_A)-prevvect.Dep_a);
 	    }
-	    	prevvect.SetVector(	mmToTick((*it)->PosOutil_X),mmToTick((*it)->PosOutil_Y),
-					mmToTick((*it)->PosOutil_Z),mmToTick((*it)->PosOutil_A));
+	    	prevvect.SetVector(	mmToTickX((*it)->PosOutil_X),mmToTickY((*it)->PosOutil_Y),
+					mmToTickZ((*it)->PosOutil_Z),mmToTickA((*it)->PosOutil_A));
 	    profileGenerator(vect);
 	    first=false;
 	    iter++;

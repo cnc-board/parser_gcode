@@ -24,9 +24,12 @@ class Spi_comm;
 class Accel_converter {
 private:
 	uint64_t epoch_present=0;
-	int64_t mmToTick(double val);
+	int64_t mmToTickX(double val);
+	int64_t mmToTickY(double val);
+	int64_t mmToTickZ(double val);
+	int64_t mmToTickA(double val);
 	void profileGenerator(Movement_Vector Dvect);
-	double convertFactorMmToTick=127.896942801*8796093022208.0;
+	double _convertFactorMmToTick_X, _convertFactorMmToTick_Y, _convertFactorMmToTick_Z, _convertFactorMmToTick_A;
 	int32_t accelDeccel=1548;//TODO find a spot to store accel/deccel/vmax params
 	uint64_t Vmax=0x4816f0068; //TODO create profileGen class
 	uint64_t Ttick_to_acceldeccel=0;
@@ -34,7 +37,7 @@ private:
 
 public:
 	TabAccelVector Accel_vectors;
-	Accel_converter();
+	Accel_converter(double convertFactorMmToTick_X, double convertFactorMmToTick_Y, double convertFactorMmToTick_Z, double convertFactorMmToTick_A);
 	void calculateAccelTick();
 	virtual ~Accel_converter();
 	bool generate_tick_vector(Gcode::TabEtatMachine& tabetat);

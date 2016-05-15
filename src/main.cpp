@@ -29,7 +29,7 @@ int main(int argc, char **argv)
 	Gcode Prog1 = Gcode(argv[1], EtatInit);
 
 	Prog1.parser();
-	Accel_converter conv;
+	Accel_converter conv(127.896942801*8796093022208.0, 127.896942801*8796093022208.0, 127.896942801*8796093022208.0, 0.0); //FactorMmToTick
 	conv.generate_tick_vector(Prog1._TabEtatMachine);
 	cout << "Cycle time : " << (conv.Accel_vectors[conv.Accel_vectors.size()-1]->epoch_stop)/(25000000*60)<< " minutes" << endl;
 	comm.execute_reset_off();

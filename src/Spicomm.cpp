@@ -79,7 +79,7 @@ Spi_comm::~Spi_comm() {
 void Spi_comm::transmit_vector(Accel_vector& vect) {
 	char tx[1+2+2+2+2+6];
 	char rx[1+2+2+2+2+6];
-	tx[0]=0xA0;
+	tx[0]=0xA0; //0xA0  =  vector
 
 	tx[1]=vect.Accel_x&0xFF;
 	tx[2]=(vect.Accel_x>>8)&0xFF;
