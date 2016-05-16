@@ -121,7 +121,7 @@ void Accel_converter::profileGenerator(Movement_Vector Dvect, Gcode::Class_EtatM
 			_axe.Temps.Accel_Y ++;
 			speed += mm_per_second_square_to_tick_per_tick_square(_Limite_machine.Acc_mm_max_Y, y);
 			_axe.Distance.Accel_Y += speed;
-		} while (speed < Etat->VitesseDeplacement_Y);
+		} while (speed < mm_per_second_to_tick_per_tick(Etat->VitesseDeplacement_Y, y));
 				//if(speed!=Vmax)Vmax=speed;
 
 		cout << "Vitesse de l'axe Y (tick / tick) is " << Etat->VitesseDeplacement_Y << endl;
@@ -133,7 +133,7 @@ void Accel_converter::profileGenerator(Movement_Vector Dvect, Gcode::Class_EtatM
 			_axe.Temps.Accel_Z ++;
 			speed += mm_per_second_square_to_tick_per_tick_square(_Limite_machine.Acc_mm_max_Z, z);
 			_axe.Distance.Accel_Z += speed;
-		} while (speed < Etat->VitesseDeplacement_Z);
+		} while (speed < mm_per_second_to_tick_per_tick(Etat->VitesseDeplacement_Z, z));
 				//if(speed!=Vmax)Vmax=speed;
 
 		cout << "Vitesse de l'axe Z (tick / tick) is " << Etat->VitesseDeplacement_Z << endl;
@@ -145,7 +145,7 @@ void Accel_converter::profileGenerator(Movement_Vector Dvect, Gcode::Class_EtatM
 			_axe.Temps.Accel_A ++;
 			speed += mm_per_second_square_to_tick_per_tick_square(_Limite_machine.Acc_mm_max_A, a);
 			_axe.Distance.Accel_A += speed;
-		} while (speed < Etat->VitesseDeplacement_A);
+		} while (speed < mm_per_second_to_tick_per_tick(Etat->VitesseDeplacement_A, a));
 				//if(speed!=Vmax)Vmax=speed;
 
 		cout << "Vitesse de l'axe A (tick / tick) is " << Etat->VitesseDeplacement_A << endl;
@@ -161,6 +161,24 @@ void Accel_converter::profileGenerator(Movement_Vector Dvect, Gcode::Class_EtatM
 	int32_t accel_x,accel_y,accel_z;
 	uint64_t epoch_begin,epoch_end_accel,epoch_end_conti,epoch_end;
 	epoch_begin=epoch_present;
+
+	uint64_t depx;
+	if(Dvect.Dep_x > 0){depx = Dvect.Dep_x;} else {depx = - Dvect.Dep_x;}
+//******************************************************************
+//********************************************************************
+
+	//A finir !!
+	// chercher l'axe qui met le plus de temps à éfectuer son mouvement
+	// pas obligé d'utiliser des tick, mais des mm/s ou mm/s/s etc (a voir si c'est pas plus simple)optimisation ??(int vs float)
+	//Le mouvement le plus lent est prioritaire,
+	// Le coef des autres axe en découlera.
+
+	//Faire le calcul du temps que met l'axe pour accélérer avec des intégrales et pas avec des boucle comme plus haut
+
+	if(mmToTick((double)depx, 1) > _axe.Distance.Accel_X * 2)
+	{
+
+	}
 
 	if(abs(Dvect.Dep_y)>abs(Dvect.Dep_x)){//todo : WRONG SELECT MAX
 		if(abs(Dvect.Dep_z)>abs(Dvect.Dep_y))
