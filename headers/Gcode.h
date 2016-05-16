@@ -60,6 +60,7 @@ public:
 
 	private:
 	};
+
 	typedef std::vector<Class_EtatMachine*> TabEtatMachine;
 
 
