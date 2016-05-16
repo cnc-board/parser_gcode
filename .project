@@ -24,4 +24,11 @@
 		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>Debug/test.txt</name>
+			<type>1</type>
+			<locationURI>PROJECT_LOC/test.txt</locationURI>
+		</link>
+	</linkedResources>
 </projectDescription>

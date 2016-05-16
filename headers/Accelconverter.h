@@ -28,20 +28,16 @@ class Accel_converter {
 private:
 	uint64_t epoch_present=0;
 	typedef enum axes{x,y,z,a} Axis;
+	const uint64_t _Tick_per_pulse = 0x1000000000000; //= 0x100000000000;
+	uint64_t mmToTick(double val,  Axis axe);
 
-	int64_t mmToPulse(double val,  Axis axe);
+	uint64_t mm_per_second_square_to_tick_per_tick_square(float mm_per_second_square, Axis axe);
+	uint64_t mm_per_second_to_tick_per_tick(float mm_per_second, Axis axe);
 
-	int64_t mm_per_second_square_to_pulse_per_tick_square(float mm_per_second_square, Axis axe);
-
-	int64_t pulse_per_tick_square_X;
-	int64_t pulse_per_tick_square_Y;
-	int64_t pulse_per_tick_square_Z;
-	int64_t pulse_per_tick_square_A;
-
-	double _convertFactorMmToTick_X;
-	double _convertFactorMmToTick_Y;
-	double _convertFactorMmToTick_Z;
-	double _convertFactorMmToTick_A;
+	double _Pulse_per_mm_X;
+	double _Pulse_per_mm_Y;
+	double _Pulse_per_mm_Z;
+	double _Pulse_per_mm_A;
 
 	Limit_machine _Limite_machine;
 
@@ -75,7 +71,7 @@ private:
 
 public:
 	TabAccelVector Accel_vectors;
-	Accel_converter(double convertFactorMmToTick_X, double convertFactorMmToTick_Y, double convertFactorMmToTick_Z, double convertFactorMmToTick_A, Limit_machine limit_machine);
+	Accel_converter(float Pulse_per_mm_X, float Pulse_per_mm_Y, float Pulse_per_mm_Z, float Pulse_per_mm_A, Limit_machine limit_machine);
 	void calculateAccelTick();
 	virtual ~Accel_converter();
 	bool generate_tick_vector(Gcode::TabEtatMachine& tabetat);

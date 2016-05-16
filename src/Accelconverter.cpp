@@ -9,29 +9,29 @@
 #include "../headers/Spicomm.h"
 #include "../headers/Gcode.h"
 
-Accel_converter::Accel_converter(double convertFactorMmToTick_X, double convertFactorMmToTick_Y,
-								double convertFactorMmToTick_Z, double convertFactorMmToTick_A, Limit_machine limit_machine) :
-								_convertFactorMmToTick_X(convertFactorMmToTick_X), _convertFactorMmToTick_Y(convertFactorMmToTick_Y),
-								_convertFactorMmToTick_Z(convertFactorMmToTick_Z), _convertFactorMmToTick_A(convertFactorMmToTick_A), _Limite_machine(limit_machine)
+Accel_converter::Accel_converter(float Pulse_per_mm_X, float Pulse_per_mm_Y,
+								float Pulse_per_mm_Z, float Pulse_per_mm_A, Limit_machine limit_machine) :
+								_Pulse_per_mm_X(Pulse_per_mm_X), _Pulse_per_mm_Y(Pulse_per_mm_Y),
+								_Pulse_per_mm_Z(Pulse_per_mm_Z), _Pulse_per_mm_A(Pulse_per_mm_A), _Limite_machine(limit_machine)
 {
 
 }
 
-int64_t Accel_converter::mmToPulse(double val,  Axis axe) {
+uint64_t Accel_converter::mmToTick(double val,  Axis axe) {
 	int64_t ret;
 	switch(axe)
 	{
 	case x:
-		ret = val*_convertFactorMmToTick_X;
+		ret = val*_Pulse_per_mm_X*_Tick_per_pulse;
 		break;
 	case y:
-		ret = val*_convertFactorMmToTick_Y;
+		ret = val*_Pulse_per_mm_X*_Tick_per_pulse;
 		break;
 	case z:
-		ret = val*_convertFactorMmToTick_Z;
+		ret = val*_Pulse_per_mm_X*_Tick_per_pulse;
 		break;
 	case a:
-		ret = val*_convertFactorMmToTick_A;
+		ret = val*_Pulse_per_mm_X*_Tick_per_pulse;
 		break;
 	}
 	return ret;
@@ -42,17 +42,48 @@ Accel_converter::~Accel_converter() {
 	// TODO Auto-generated destructor stub
 }
 
-int64_t Accel_converter::mm_per_second_square_to_pulse_per_tick_square(float mm_per_second_square,  Axis axe)
+uint64_t Accel_converter::mm_per_second_square_to_tick_per_tick_square(float mm_per_second_square,  Axis axe)
 {
-	int64_t tick_per_second_square;
-
-	tick_per_second_square = mmToPulse((double) mm_per_second_square, axe);
-
-	return tick_per_second_square / FREQUENCE_FPGA;
-
+	uint64_t ret;
+	double xx;
+	switch(axe)
+	{//todo A vérifier : Perte d'information ??
+	case x:
+		ret = (uint64_t)(_Tick_per_pulse * mm_per_second_square * _Pulse_per_mm_X) / (25000000.0 * 25000000.0);
+		break;
+	case y:
+		ret = (uint64_t)(_Tick_per_pulse * mm_per_second_square * _Pulse_per_mm_Y) / (25000000.0 * 25000000.0);
+		break;
+	case z:
+		ret = (uint64_t)(_Tick_per_pulse * mm_per_second_square * _Pulse_per_mm_Z) / (25000000.0 * 25000000.0);
+		break;
+	case a:
+		ret = (uint64_t)(_Tick_per_pulse * mm_per_second_square * _Pulse_per_mm_A) / (25000000.0 * 25000000.0);
+		break;
+	}
+	return ret;
 }
 
-
+uint64_t Accel_converter::mm_per_second_to_tick_per_tick(float mm_per_second,  Axis axe)
+{
+	uint64_t ret;
+	switch(axe)
+	{//todo A vérifier : Perte d'information ??
+	case x:
+		ret = (uint64_t)(((double)mm_per_second * (double)(_Pulse_per_mm_X * (double)_Tick_per_pulse)) / 25000000.0);
+		break;
+	case y:
+		ret = (uint64_t)(((double)mm_per_second * (double)(_Pulse_per_mm_Y * (double)_Tick_per_pulse)) / 25000000.0);
+		break;
+	case z:
+		ret = (uint64_t)(((double)mm_per_second * (double)(_Pulse_per_mm_Z * (double)_Tick_per_pulse)) / 25000000.0);
+		break;
+	case a:
+		ret = (uint64_t)(((double)mm_per_second * (double)(_Pulse_per_mm_A * (double)_Tick_per_pulse)) / 25000000.0);
+		break;
+	}
+	return ret;
+}
 
 void Accel_converter::profileGenerator(Movement_Vector Dvect, Gcode::Class_EtatMachine* Etat) {
 	uint64_t speed=0;
@@ -62,58 +93,66 @@ void Accel_converter::profileGenerator(Movement_Vector Dvect, Gcode::Class_EtatM
 			|| _vitesse_Z != Etat->VitesseDeplacement_Z || _vitesse_A != Etat->VitesseDeplacement_A)
 	{	//todo factoriser "if"
 
+		_axe.Temps.Accel_X = 0;
+		_axe.Temps.Accel_Y = 0;
+		_axe.Temps.Accel_Y = 0;
+		_axe.Temps.Accel_Y = 0;
+		_axe.Distance.Accel_X = 0;
+		_axe.Distance.Accel_X = 0;
+		_axe.Distance.Accel_X = 0;
+		_axe.Distance.Accel_X = 0;
+
+
+		cout << "mm_per_second_square_to_tick_per_tick_square(_Limite_machine.Acc_mm_max_X, x) = " << mm_per_second_square_to_tick_per_tick_square(_Limite_machine.Acc_mm_max_X, x) << endl;
 		do
 		{
 			_axe.Temps.Accel_X ++;
-			speed += _Limite_machine.Acc_mm_max_X;
+			speed += mm_per_second_square_to_tick_per_tick_square(_Limite_machine.Acc_mm_max_X, x);
 			_axe.Distance.Accel_X += speed;
-		} while (speed < Etat->VitesseDeplacement_X);
+		} while (speed < mm_per_second_to_tick_per_tick(Etat->VitesseDeplacement_X,x));
 		//if(speed!=Vmax)Vmax=speed;
-
-		cout << "Vitesse de l'axe X (tick / tick) is" << Etat->VitesseDeplacement_X << endl;
+		cout << "speed : " << speed << endl;
+		cout << "Vitesse de l'axe X (tick / tick) is " << mm_per_second_to_tick_per_tick(Etat->VitesseDeplacement_X,x) << endl;
 		cout << "Temps AccelTick is " << _axe.Temps.Accel_X << endl;
 		cout << "Distance AccelTick is " << _axe.Distance.Accel_X << endl<<endl;
 
 		do
 		{
 			_axe.Temps.Accel_Y ++;
-			speed += _Limite_machine.Acc_mm_max_Y;
+			speed += mm_per_second_square_to_tick_per_tick_square(_Limite_machine.Acc_mm_max_Y, y);
 			_axe.Distance.Accel_Y += speed;
 		} while (speed < Etat->VitesseDeplacement_Y);
 				//if(speed!=Vmax)Vmax=speed;
 
-		cout << "Vitesse de l'axe Y (tick / tick) is" << Etat->VitesseDeplacement_Y << endl;
+		cout << "Vitesse de l'axe Y (tick / tick) is " << Etat->VitesseDeplacement_Y << endl;
 		cout << "Temps AccelTick is " << _axe.Temps.Accel_Y << endl;
 		cout << "Distance AccelTick is " << _axe.Distance.Accel_Y << endl<<endl;
 
 		do
 		{
 			_axe.Temps.Accel_Z ++;
-			speed += _Limite_machine.Acc_mm_max_Z;
+			speed += mm_per_second_square_to_tick_per_tick_square(_Limite_machine.Acc_mm_max_Z, z);
 			_axe.Distance.Accel_Z += speed;
 		} while (speed < Etat->VitesseDeplacement_Z);
 				//if(speed!=Vmax)Vmax=speed;
 
-		cout << "Vitesse de l'axe Z (tick / tick) is" << Etat->VitesseDeplacement_Z << endl;
+		cout << "Vitesse de l'axe Z (tick / tick) is " << Etat->VitesseDeplacement_Z << endl;
 		cout << "Temps AccelTick is " << _axe.Temps.Accel_Z << endl;
 		cout << "Distance AccelTick is " << _axe.Distance.Accel_Z << endl<<endl;
 
 		do
 		{
 			_axe.Temps.Accel_A ++;
-			speed += _Limite_machine.Acc_mm_max_A;
+			speed += mm_per_second_square_to_tick_per_tick_square(_Limite_machine.Acc_mm_max_A, a);
 			_axe.Distance.Accel_A += speed;
 		} while (speed < Etat->VitesseDeplacement_A);
 				//if(speed!=Vmax)Vmax=speed;
 
-		cout << "Vitesse de l'axe A (tick / tick) is" << Etat->VitesseDeplacement_A << endl;
+		cout << "Vitesse de l'axe A (tick / tick) is " << Etat->VitesseDeplacement_A << endl;
 		cout << "Temps AccelTick is " << _axe.Temps.Accel_A << endl;
 		cout << "Distance AccelTick is " << _axe.Distance.Accel_A << endl<<endl;
 
 	}
-
-
-
 
 
 	typedef enum axes{x,y,z,a} biggest_axes;
@@ -228,16 +267,16 @@ bool Accel_converter::generate_tick_vector(Gcode::TabEtatMachine & tabetat) {
 	    if((*it)->Deplacement==false) continue;
 	    if(first)
 	    {
-	    	vect.SetVector(	mmToPulse((*it)->PosOutil_X, x),mmToPulse((*it)->PosOutil_Y, y),
-	    					mmToPulse((*it)->PosOutil_Z, z),mmToPulse((*it)->PosOutil_A, a));
+	    	vect.SetVector(	mmToTick((*it)->PosOutil_X, x),mmToTick((*it)->PosOutil_Y, y),
+	    					mmToTick((*it)->PosOutil_Z, z),mmToTick((*it)->PosOutil_A, a));
 	    }
 	    else
 	    {
-	    	vect.SetVector(	mmToPulse((*it)->PosOutil_X, x)-prevvect.Dep_x,mmToPulse((*it)->PosOutil_Y, y)-prevvect.Dep_y,
-	    		    		mmToPulse((*it)->PosOutil_Z, z)-prevvect.Dep_z,mmToPulse((*it)->PosOutil_A, a)-prevvect.Dep_a);
+	    	vect.SetVector(	mmToTick((*it)->PosOutil_X, x)-prevvect.Dep_x,mmToTick((*it)->PosOutil_Y, y)-prevvect.Dep_y,
+	    		    		mmToTick((*it)->PosOutil_Z, z)-prevvect.Dep_z,mmToTick((*it)->PosOutil_A, a)-prevvect.Dep_a);
 	    }
-	    	prevvect.SetVector(	mmToPulse((*it)->PosOutil_X, x),mmToPulse((*it)->PosOutil_Y, y),
-					mmToPulse((*it)->PosOutil_Z, z),mmToPulse((*it)->PosOutil_A, a));
+	    	prevvect.SetVector(	mmToTick((*it)->PosOutil_X, x),mmToTick((*it)->PosOutil_Y, y),
+					mmToTick((*it)->PosOutil_Z, z),mmToTick((*it)->PosOutil_A, a));
 	    profileGenerator(vect, (*it));
 	    first=false;
 	    iter++;
