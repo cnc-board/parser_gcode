@@ -17,7 +17,11 @@
 #include "../headers/Movement_Vector.h"
 #include "../headers/Limit_machine.h"
 
+#define DISPLAY_GENE_VECTOR  1
+
 #define FREQUENCE_FPGA 25000000
+
+
 using namespace std;
 
 class Accel_vector;
@@ -31,8 +35,8 @@ private:
 	const uint64_t _Tick_per_pulse = 0x1000000000000; //= 0x100000000000;
 	uint64_t mmToTick(double val,  Axis axe);
 
-	uint64_t mm_per_second_square_to_tick_per_tick_square(float mm_per_second_square, Axis axe);
-	uint64_t mm_per_second_to_tick_per_tick(float mm_per_second, Axis axe);
+	uint64_t acc_mm_to_tick(float mm_per_second_square, Axis axe);
+	uint64_t vit_mm_to_tick(float mm_per_second, Axis axe);
 
 	double _Pulse_per_mm_X;
 	double _Pulse_per_mm_Y;
@@ -49,7 +53,38 @@ private:
 	int32_t accelDeccel=1548;//TODO find a spot to store accel/deccel/vmax params
 	uint64_t Vmax=0x4816f0068; //TODO create profileGen class
 
-	struct Axe { // temps et distance d'accélération en tick
+
+
+
+	struct {
+		uint64_t x = 0;
+		uint64_t y = 0;
+		uint64_t z = 0;
+		uint64_t a = 0;
+	}_acc_tick;
+
+	struct {
+		uint64_t x = 0;
+		uint64_t y = 0;
+		uint64_t z = 0;
+		uint64_t a = 0;
+	}_vit_tick;
+
+	struct {
+		uint64_t x = 0;
+		uint64_t y = 0;
+		uint64_t z = 0;
+		uint64_t a = 0;
+	}_acc_temps;
+
+	struct {
+		uint64_t x = 0;
+		uint64_t y = 0;
+		uint64_t z = 0;
+		uint64_t a = 0;
+	}_acc_distance;
+
+	/*struct Axe { // temps et distance d'accélération en tick
 		struct {
 			uint64_t Accel_X = 0;
 			uint64_t Accel_Y = 0;
@@ -64,7 +99,7 @@ private:
 		} Distance;
 	};
 
-	Axe _axe;
+	Axe _axe;*/
 
 	uint64_t Ttick_to_accel=0;
 			uint64_t Dtick_to_accel=0;

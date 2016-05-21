@@ -375,6 +375,13 @@ void Gcode::Deplacement_G00_G01(string line, bool G00)
 	else
 		throw Err(ModeDistanceNonDef);
 
+
+
+	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	// mofifier la vitesse pour adapter la vitesse en diagonal !!!
+
+
 	//Modification vitesse d'avance
 	if (G00) //Vitesse rapide par defaut
 	{

@@ -26,19 +26,6 @@ public:
 	float Acc_mm_max_Z;
 	float Acc_mm_max_A;
 
-
-private:
-
-
-
-	/*void compute_Vmm_and_Accmm_to_Vtick_and_Acctick();
-
-	uint64_t _Vitesse_max_tick_per_tick_X; //todo faire constructeur pour remplire variables
-	uint64_t _Vitesse_max_tick_per_tick_Y;
-	uint64_t _Vitesse_max_tick_per_tick_Z;
-	uint64_t _Vitesse_max_tick_per_tick_A;
-*/
-
 };
 
 #endif /* HEADERS_LIMIT_MACHINE_H_ */
