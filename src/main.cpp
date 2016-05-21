@@ -22,14 +22,10 @@ int main(int argc, char **argv)
 	EtatInit.PosOutil_Z = 0;
 	EtatInit.PosPiece_X = 10;
 	EtatInit.PosPiece_Y = 20;
-	EtatInit.V_Avance_Defaut_A = 0;
-	EtatInit.V_Avance_Defaut_X = 50;
-	EtatInit.V_Avance_Defaut_Y = 50;
-	EtatInit.V_Avance_Defaut_Z = 200;
-	EtatInit.V_Rapide_Defaut_A = 0;
-	EtatInit.V_Rapide_Defaut_X = 50;
-	EtatInit.V_Rapide_Defaut_Y = 50;
-	EtatInit.V_Rapide_Defaut_Z = 120;
+	EtatInit.vitesse_deplacement_broche_G00 = 100;
+	EtatInit.vitesse_deplacement_broche_G01 = 50;
+	EtatInit.vitesse_deplacement_axe_z_G00 = 200;
+	EtatInit.vitesse_deplacement_axe_z_G00 = 150;
 
 	Limit_machine lim_machine(100,100,100,100,10,10,50,5);
 

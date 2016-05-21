@@ -1,7 +1,7 @@
 #include "../headers/Gcode.h"
 #include "../headers/Err.h"
 #include <string>
-
+#include <cmath>
 
 
 
@@ -36,15 +36,12 @@ Gcode::Gcode(string FileName, InitMachine InitMachine)
 	_PosPiece_X = InitMachine.PosPiece_X;
 	_PosPiece_Y = InitMachine.PosPiece_Y;
 
-	_V_Rapide_Defaut_X = InitMachine.V_Rapide_Defaut_X;
-	_V_Rapide_Defaut_Y = InitMachine.V_Rapide_Defaut_Y;
-	_V_Rapide_Defaut_Z = InitMachine.V_Rapide_Defaut_Z;
-	_V_Rapide_Defaut_A = InitMachine.V_Rapide_Defaut_A;
 
-	_V_Avance_Defaut_X = InitMachine.V_Avance_Defaut_X;
-	_V_Avance_Defaut_Y = InitMachine.V_Avance_Defaut_Y;
-	_V_Avance_Defaut_Z = InitMachine.V_Avance_Defaut_Z;
-	_V_Avance_Defaut_A = InitMachine.V_Avance_Defaut_A;
+	_vitesse_deplacement_broche_G00 = InitMachine.vitesse_deplacement_broche_G00;
+	_vitesse_deplacement_broche_G01 = InitMachine.vitesse_deplacement_broche_G01;
+	_vitesse_deplacement_axe_z_G00 = InitMachine.vitesse_deplacement_axe_z_G00;
+	_vitesse_deplacement_axe_z_G01 = InitMachine.vitesse_deplacement_axe_z_G01;
+
 
 	_MoteurDefaut = Arret;
 	_ModeDistance = InitMachine.ModeDistance;
@@ -153,6 +150,9 @@ void Gcode::parser()
 						break;
 					case ModeDistanceNonDef:
 						cout << "Mode distance non defini !" << line << endl;
+						break;
+					case MvSur3ou4AxesNonPrisEnCharge:
+						cout << "Mouvement sur plus de deux axes simultanément non pris en charge" << endl;
 						break;
 					default:
 						break;
@@ -357,6 +357,9 @@ void Gcode::Deplacement_G00_G01(string line, bool G00)
 	if (!(testX || testY || testZ || testA))
 		throw Err(MissingParam);
 
+	if((testX && testY) && (testZ || testA))
+		throw Err(MvSur3ou4AxesNonPrisEnCharge);
+
 	//Modification de la position de l'outil
 	if (EtatMachine->ModeDistance == Absolues)
 	{
@@ -380,23 +383,46 @@ void Gcode::Deplacement_G00_G01(string line, bool G00)
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// mofifier la vitesse pour adapter la vitesse en diagonal !!!
+	double alpha;
 
+	if(testX || testY) //calcul de l'angle formé par le déplacement
+	{
+
+		if(TabEtatMachine().size() != 0) //S'il il y a un autre etat machine dans le tableau (obtention du déplacement par rapport à ce dernier)
+		{
+
+			Class_EtatMachine* dernier_etat = _TabEtatMachine[_TabEtatMachine.size()-1];
+			alpha = atan((EtatMachine->PosOutil_Y - dernier_etat->PosOutil_Y) / (EtatMachine->PosOutil_X - dernier_etat->PosOutil_X));
+		}
+		else
+		{
+			alpha = atan(EtatMachine->PosOutil_Y / EtatMachine->PosOutil_X);
+		}
+	}
 
 	//Modification vitesse d'avance
-	if (G00) //Vitesse rapide par defaut
+	if (testZ)
 	{
-		EtatMachine->VitesseDeplacement_X = _V_Rapide_Defaut_X;
-		EtatMachine->VitesseDeplacement_Y = _V_Rapide_Defaut_Y;
-		EtatMachine->VitesseDeplacement_Z = _V_Rapide_Defaut_Z;
-		EtatMachine->VitesseDeplacement_A = _V_Rapide_Defaut_A;
+		EtatMachine->VitesseDeplacement_X = 0;
+		EtatMachine->VitesseDeplacement_Y = 0;
+		EtatMachine->VitesseDeplacement_Z = G00?_vitesse_deplacement_axe_z_G00:_vitesse_deplacement_axe_z_G01;
+		EtatMachine->VitesseDeplacement_A = 0;
 	}
-	else //Vitesse dans matière par defaut
+	else if (testA)
 	{
-		EtatMachine->VitesseDeplacement_X = _V_Avance_Defaut_X;
-		EtatMachine->VitesseDeplacement_Y = _V_Avance_Defaut_Y;
-		EtatMachine->VitesseDeplacement_Z = _V_Avance_Defaut_Z;
-		EtatMachine->VitesseDeplacement_A = _V_Avance_Defaut_A;
+		//A faire
 	}
+	else
+	{
+		EtatMachine->VitesseDeplacement_X = (float)cos(alpha) * G00?_vitesse_deplacement_broche_G00:_vitesse_deplacement_broche_G01;
+		EtatMachine->VitesseDeplacement_Y = (float)cos(alpha) * G00?_vitesse_deplacement_broche_G00:_vitesse_deplacement_broche_G01;
+		EtatMachine->VitesseDeplacement_Z = 0;
+		EtatMachine->VitesseDeplacement_A = 0;
+	}
+
+
+
+
 
 
 	//Ajout de l'état courant dans la liste

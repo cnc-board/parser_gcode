@@ -28,8 +28,10 @@ struct InitMachine
 	double PosOutil_X, PosOutil_Y, PosOutil_Z, PosOutil_A;//Position de l'outil avant début cycle
 	double PosPiece_X, PosPiece_Y;//Position de la pièce à usiner
 
-	float V_Rapide_Defaut_X, V_Rapide_Defaut_Y, V_Rapide_Defaut_Z, V_Rapide_Defaut_A;//Vitesse rapide par defaut
-	float V_Avance_Defaut_X, V_Avance_Defaut_Y, V_Avance_Defaut_Z, V_Avance_Defaut_A;//Vitesse d'avance par defaut
+	float vitesse_deplacement_broche_G00; //vitesse de positionnement
+	float vitesse_deplacement_broche_G01; //vitesse d'usinage
+	float vitesse_deplacement_axe_z_G00;
+	float vitesse_deplacement_axe_z_G01;
 
 	ChoixModeDistances ModeDistance;// Mode : non défini, Absolu ou relatif
 };
@@ -52,6 +54,7 @@ public:
 
 		bool Deplacement;
 		double PosOutil_X, PosOutil_Y, PosOutil_Z, PosOutil_A;
+
 		float VitesseDeplacement_X, VitesseDeplacement_Y, VitesseDeplacement_Z, VitesseDeplacement_A;
 		enuMoteurBroche MoteurBroche;
 		ChoixModeDistances ModeDistance;
@@ -78,6 +81,13 @@ private:
 
 	double _PosOutil_X, _PosOutil_Y, _PosOutil_Z, _PosOutil_A;//Position de l'outil avant début cycle
 	double _PosPiece_X, _PosPiece_Y;//Position de la pièce à usiner
+
+
+	float _vitesse_deplacement_broche_G00; //vitesse de positionnement
+	float _vitesse_deplacement_broche_G01; //vitesse d'usinage
+	float _vitesse_deplacement_axe_z_G00;
+	float _vitesse_deplacement_axe_z_G01;
+
 
 	float _V_Rapide_Defaut_X, _V_Rapide_Defaut_Y, _V_Rapide_Defaut_Z, _V_Rapide_Defaut_A;//Vitesse rapide par defaut
 	float _V_Avance_Defaut_X, _V_Avance_Defaut_Y, _V_Avance_Defaut_Z, _V_Avance_Defaut_A;//Vitesse d'avance par defaut
