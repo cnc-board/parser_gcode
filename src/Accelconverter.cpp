@@ -300,10 +300,10 @@ void Accel_converter::profileGenerator(Movement_Vector Dvect, Gcode::Class_EtatM
 
 	cout << endl << "Calcul des facteurs de réduction des accélérations : " << endl;
 
-	facteur_reduc_acc_x = (double)((double)(4 * abs(Dvect.Dep_x)) / (double)(_acc_tick.x==0?1:_acc_tick.x * axe_prioritaire.temps_mouvement * axe_prioritaire.temps_mouvement));
-	facteur_reduc_acc_y = (double)((double)(4 * abs(Dvect.Dep_y)) / (double)(_acc_tick.y==0?1:_acc_tick.y * axe_prioritaire.temps_mouvement * axe_prioritaire.temps_mouvement));
-	facteur_reduc_acc_z = (double)((double)(4 * abs(Dvect.Dep_z)) / (double)(_acc_tick.z==0?1:_acc_tick.z * axe_prioritaire.temps_mouvement * axe_prioritaire.temps_mouvement));
-	facteur_reduc_acc_a = (double)((double)(4 * abs(Dvect.Dep_a)) / (double)(_acc_tick.a==0?1:_acc_tick.a * axe_prioritaire.temps_mouvement * axe_prioritaire.temps_mouvement));
+	facteur_reduc_acc_x = (double)((long double)(4 * abs(Dvect.Dep_x)) / (long double)(_acc_tick.x==0?1:(long double)_acc_tick.x * (long double)axe_prioritaire.temps_mouvement * (long double)axe_prioritaire.temps_mouvement));
+	facteur_reduc_acc_y = (double)((long double)(4 * abs(Dvect.Dep_y)) / (long double)(_acc_tick.y==0?1:(long double)_acc_tick.y * (long double)axe_prioritaire.temps_mouvement * (long double)axe_prioritaire.temps_mouvement));
+	facteur_reduc_acc_z = (double)((long double)(4 * abs(Dvect.Dep_z)) / (long double)(_acc_tick.z==0?1:(long double)_acc_tick.z * (long double)axe_prioritaire.temps_mouvement * (long double)axe_prioritaire.temps_mouvement));
+	facteur_reduc_acc_a = (double)((long double)(4 * abs(Dvect.Dep_a)) / (long double)(_acc_tick.a==0?1:(long double)_acc_tick.a * (long double)axe_prioritaire.temps_mouvement * (long double)axe_prioritaire.temps_mouvement));
 
 	cout << "facteur axe X : " << facteur_reduc_acc_x <<endl;
 	cout << "facteur axe Y : " << facteur_reduc_acc_y <<endl;
