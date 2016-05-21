@@ -414,8 +414,8 @@ void Gcode::Deplacement_G00_G01(string line, bool G00)
 	}
 	else
 	{
-		EtatMachine->VitesseDeplacement_X = (float)cos(alpha) * G00?_vitesse_deplacement_broche_G00:_vitesse_deplacement_broche_G01;
-		EtatMachine->VitesseDeplacement_Y = (float)cos(alpha) * G00?_vitesse_deplacement_broche_G00:_vitesse_deplacement_broche_G01;
+		EtatMachine->VitesseDeplacement_X = (float)cos(alpha) * (G00==true?_vitesse_deplacement_broche_G00:_vitesse_deplacement_broche_G01);
+		EtatMachine->VitesseDeplacement_Y = (float)sin(alpha) * (G00==true?_vitesse_deplacement_broche_G00:_vitesse_deplacement_broche_G01);
 		EtatMachine->VitesseDeplacement_Z = 0;
 		EtatMachine->VitesseDeplacement_A = 0;
 	}

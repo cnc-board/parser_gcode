@@ -29,11 +29,15 @@ Accel_converter::Accel_converter(float Pulse_per_mm_X, float Pulse_per_mm_Y,
 }
 
 uint64_t Accel_converter::mmToTick(double val,  Axis axe) {
-	int64_t ret;
+	long double ret;
 	switch(axe)
 	{
 	case x:
-		ret = val*_Pulse_per_mm_X*_Tick_per_pulse;
+		ret = (uint64_t)((long double)val*(long double)_Pulse_per_mm_X*(long double)_Tick_per_pulse);
+		if(ret / ((long double)_Pulse_per_mm_X*(long double)_Tick_per_pulse) != (long double)val)
+		{
+			cout << "Débordement !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+		}
 		break;
 	case y:
 		ret = val*_Pulse_per_mm_X*_Tick_per_pulse;
@@ -45,7 +49,7 @@ uint64_t Accel_converter::mmToTick(double val,  Axis axe) {
 		ret = val*_Pulse_per_mm_X*_Tick_per_pulse;
 		break;
 	}
-	return ret;
+	return (uint64_t)ret;
 }
 
 
@@ -97,6 +101,7 @@ uint64_t Accel_converter::vit_mm_to_tick(float mm_per_second,  Axis axe)
 
 void Accel_converter::profileGenerator(Movement_Vector Dvect, Gcode::Class_EtatMachine* Etat) {
 	static float _vitesse_X, _vitesse_Y, _vitesse_Z, _vitesse_A;
+	static int nb = 0;
 	typedef enum axes{X,Y,Z,A} biggest_axes;
 	struct {
 		uint64_t		acc;
@@ -108,7 +113,6 @@ void Accel_converter::profileGenerator(Movement_Vector Dvect, Gcode::Class_EtatM
 		biggest_axes	name_of_axis;
 	}axe_prioritaire;
 
-	int64_t bigestcoord=Dvect.Dep_x;
 
 	int32_t accel_x,accel_y,accel_z;
 
@@ -125,10 +129,15 @@ void Accel_converter::profileGenerator(Movement_Vector Dvect, Gcode::Class_EtatM
 	double facteur_reduc_acc_x; double facteur_reduc_acc_z;
 	double facteur_reduc_acc_y; double facteur_reduc_acc_a;
 
+	cout << endl << "Calcul du vecteur N°" << nb << "  -----------------------------------------------------" << endl << endl;
+	nb++;
 
 	if(_vitesse_X != Etat->VitesseDeplacement_X || _vitesse_Y != Etat->VitesseDeplacement_Y
 			|| _vitesse_Z != Etat->VitesseDeplacement_Z || _vitesse_A != Etat->VitesseDeplacement_A)
 	{	//todo factoriser "if"
+
+		_vitesse_X = Etat->VitesseDeplacement_X; _vitesse_Y = Etat->VitesseDeplacement_Y;
+		_vitesse_Z = Etat->VitesseDeplacement_Z; _vitesse_A = Etat->VitesseDeplacement_A;
 
 		_acc_distance.x = 0; _acc_temps.x = 0;
 		_acc_distance.y = 0; _acc_temps.y = 0;
@@ -398,17 +407,20 @@ bool Accel_converter::generate_tick_vector(Gcode::TabEtatMachine & tabetat) {
 	Movement_Vector prevvect(0,0,0,0);
 	unsigned int iter=0;
 	Accel_vectors.push_back(new Accel_vector(0,0,0,0,0,epoch_present+=1000));//empty begin vector
+	Gcode::TabEtatMachine::iterator it2 = tabetat.begin();
 	for(Gcode::TabEtatMachine::iterator it = tabetat.begin(); it != tabetat.end(); it++) {
 	    if((*it)->Deplacement==false) continue;
 	    if(first)
 	    {
+	    	cout << "mmToTick((*it)->PosOutil_X, x) - 2^64 : " << mmToTick((*it)->PosOutil_X, x) - pow(2,64) << endl << endl;
 	    	vect.SetVector(	mmToTick((*it)->PosOutil_X, x),mmToTick((*it)->PosOutil_Y, y),
 	    					mmToTick((*it)->PosOutil_Z, z),mmToTick((*it)->PosOutil_A, a));
 	    }
 	    else
 	    {
-	    	vect.SetVector(	mmToTick((*it)->PosOutil_X, x)-prevvect.Dep_x,mmToTick((*it)->PosOutil_Y, y)-prevvect.Dep_y,
-	    		    		mmToTick((*it)->PosOutil_Z, z)-prevvect.Dep_z,mmToTick((*it)->PosOutil_A, a)-prevvect.Dep_a);
+	    	vect.SetVector(	mmToTick((*it)->PosOutil_X - (*it2)->PosOutil_X, x),mmToTick((*it)->PosOutil_Y - (*it2)->PosOutil_Y, y),
+	    		    		mmToTick((*it)->PosOutil_Z - (*it2)->PosOutil_Z, z),mmToTick((*it)->PosOutil_A - (*it2)->PosOutil_A, a));
+	    	it2++;
 	    }
 	    	prevvect.SetVector(	mmToTick((*it)->PosOutil_X, x),mmToTick((*it)->PosOutil_Y, y),
 					mmToTick((*it)->PosOutil_Z, z),mmToTick((*it)->PosOutil_A, a));
