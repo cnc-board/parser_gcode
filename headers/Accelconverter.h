@@ -33,7 +33,7 @@ private:
 	uint64_t epoch_present=0;
 	typedef enum axes{x,y,z,a} Axis;
 	const uint64_t _Tick_per_pulse = 0x100000000000; //= 0x100000000000;
-	uint64_t mmToTick(double val,  Axis axe);
+	int64_t mmToTick(double val,  Axis axe);
 
 	uint64_t acc_mm_to_tick(float mm_per_second_square, Axis axe);
 	uint64_t vit_mm_to_tick(float mm_per_second, Axis axe);

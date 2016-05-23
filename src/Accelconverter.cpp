@@ -28,28 +28,29 @@ Accel_converter::Accel_converter(float Pulse_per_mm_X, float Pulse_per_mm_Y,
 
 }
 
-uint64_t Accel_converter::mmToTick(double val,  Axis axe) {
-	long double ret;
+int64_t Accel_converter::mmToTick(double val,  Axis axe) {
+	int64_t ret;
 	switch(axe)
 	{
 	case x:
-		ret = (uint64_t)((long double)val*(long double)_Pulse_per_mm_X*(long double)_Tick_per_pulse);
-		if(ret / ((long double)_Pulse_per_mm_X*(long double)_Tick_per_pulse) != (long double)val)
+		ret = (int64_t)((double)_Tick_per_pulse*_Pulse_per_mm_X*val);
+
+		if(ret / (_Tick_per_pulse*_Pulse_per_mm_X) != val)
 		{
 			cout << "Débordement !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
 		}
 		break;
 	case y:
-		ret = val*_Pulse_per_mm_X*_Tick_per_pulse;
+		ret = (int64_t)((double)_Tick_per_pulse*_Pulse_per_mm_Y*val);
 		break;
 	case z:
-		ret = val*_Pulse_per_mm_X*_Tick_per_pulse;
+		ret = (int64_t)((double)_Tick_per_pulse*_Pulse_per_mm_Z*val);
 		break;
 	case a:
-		ret = val*_Pulse_per_mm_X*_Tick_per_pulse;
+		ret = (int64_t)((double)_Tick_per_pulse*_Pulse_per_mm_A*val);
 		break;
 	}
-	return (uint64_t)ret;
+	return ret;
 }
 
 
@@ -110,21 +111,21 @@ void Accel_converter::profileGenerator(Movement_Vector Dvect, Gcode::Class_EtatM
 		uint64_t		acc_temps;
 		int64_t 		dist;
 		biggest_axes	name_of_axis;
-	}axe_prioritaire;
+	}static axe_prioritaire;
 
 	struct {
 		uint64_t x = 0;
 		uint64_t y = 0;
 		uint64_t z = 0;
 		uint64_t a = 0;
-	}_acc_temps;
+	}static _acc_temps;
 
 	struct {
 		uint64_t x = 0;
 		uint64_t y = 0;
 		uint64_t z = 0;
 		uint64_t a = 0;
-	}_acc_distance;
+	}static _acc_distance;
 
 	int32_t accel_x,accel_y,accel_z;
 
@@ -266,18 +267,18 @@ void Accel_converter::profileGenerator(Movement_Vector Dvect, Gcode::Class_EtatM
 					{
 					case X:
 						accel_x=axe_prioritaire.dist>0?axe_prioritaire.acc:-axe_prioritaire.acc;
-						accel_y=Dvect.Dep_y==0?0:(int32_t)((double)_acc_tick.y * facteur_reduc_acc_y);
-						accel_z=Dvect.Dep_z==0?0:(int32_t)((double)_acc_tick.z * facteur_reduc_acc_z);
+						accel_y=Dvect.Dep_y==0?0:(int32_t)((double)_acc_tick.y * (Dvect.Dep_y>0?facteur_reduc_acc_y:-facteur_reduc_acc_y));
+						accel_z=Dvect.Dep_z==0?0:(int32_t)((double)_acc_tick.z * (Dvect.Dep_z>0?facteur_reduc_acc_z:-facteur_reduc_acc_z));
 						break;
 					case Y:
 						accel_y=axe_prioritaire.dist>0?axe_prioritaire.acc:-axe_prioritaire.acc;
-						accel_x=Dvect.Dep_x==0?0:(int32_t)((double)_acc_tick.x * facteur_reduc_acc_x);
-						accel_z=Dvect.Dep_z==0?0:(int32_t)((double)_acc_tick.z * facteur_reduc_acc_z);
+						accel_x=Dvect.Dep_x==0?0:(int32_t)((double)_acc_tick.x * (Dvect.Dep_x>0?facteur_reduc_acc_x:-facteur_reduc_acc_x));
+						accel_z=Dvect.Dep_z==0?0:(int32_t)((double)_acc_tick.z * (Dvect.Dep_z>0?facteur_reduc_acc_z:-facteur_reduc_acc_z));
 						break;
 					case Z:
 						accel_z=axe_prioritaire.dist>0?axe_prioritaire.acc:-axe_prioritaire.acc;
-						accel_x=Dvect.Dep_x==0?0:(int32_t)((double)_acc_tick.x * facteur_reduc_acc_x);
-						accel_y=Dvect.Dep_y==0?0:(int32_t)((double)_acc_tick.y * facteur_reduc_acc_y);
+						accel_x=Dvect.Dep_x==0?0:(int32_t)((double)_acc_tick.x * (Dvect.Dep_x>0?facteur_reduc_acc_x:-facteur_reduc_acc_x));
+						accel_y=Dvect.Dep_y==0?0:(int32_t)((double)_acc_tick.y * (Dvect.Dep_y>0?facteur_reduc_acc_y:-facteur_reduc_acc_y));
 						break;
 					case A:
 						break;
@@ -300,18 +301,18 @@ void Accel_converter::profileGenerator(Movement_Vector Dvect, Gcode::Class_EtatM
 							{
 							case X:
 								accel_x=axe_prioritaire.dist>0?axe_prioritaire.acc:-axe_prioritaire.acc;//todo gestion si deplacement x00y00z00
-								accel_y=Dvect.Dep_y==0?0:(int32_t)((double)_acc_tick.y * facteur_reduc_acc_y);
-								accel_z=Dvect.Dep_z==0?0:(int32_t)((double)_acc_tick.z * facteur_reduc_acc_z);
+								accel_y=Dvect.Dep_y==0?0:(int32_t)((double)_acc_tick.y * (Dvect.Dep_y>0?facteur_reduc_acc_y:-facteur_reduc_acc_y));
+								accel_z=Dvect.Dep_z==0?0:(int32_t)((double)_acc_tick.z * (Dvect.Dep_z>0?facteur_reduc_acc_z:-facteur_reduc_acc_z));
 								break;
 							case Y:
 								accel_y=axe_prioritaire.dist>0?axe_prioritaire.acc:-axe_prioritaire.acc;
-								accel_x=Dvect.Dep_x==0?0:(int32_t)((double)_acc_tick.x * facteur_reduc_acc_x);
-								accel_z=Dvect.Dep_z==0?0:(int32_t)((double)_acc_tick.z * facteur_reduc_acc_z);
+								accel_x=Dvect.Dep_x==0?0:(int32_t)((double)_acc_tick.x * (Dvect.Dep_x>0?facteur_reduc_acc_x:-facteur_reduc_acc_x));
+								accel_z=Dvect.Dep_z==0?0:(int32_t)((double)_acc_tick.z * (Dvect.Dep_z>0?facteur_reduc_acc_z:-facteur_reduc_acc_z));
 								break;
 							case Z:
 								accel_z=axe_prioritaire.dist>0?axe_prioritaire.acc:-axe_prioritaire.acc;
-								accel_x=Dvect.Dep_x==0?0:(int32_t)((double)_acc_tick.x * facteur_reduc_acc_x);
-								accel_y=Dvect.Dep_y==0?0:(int32_t)((double)_acc_tick.y * facteur_reduc_acc_y);
+								accel_x=Dvect.Dep_x==0?0:(int32_t)((double)_acc_tick.x * (Dvect.Dep_x>0?facteur_reduc_acc_x:-facteur_reduc_acc_x));
+								accel_y=Dvect.Dep_y==0?0:(int32_t)((double)_acc_tick.y * (Dvect.Dep_y>0?facteur_reduc_acc_y:-facteur_reduc_acc_y));
 								break;
 							case A:
 								break;
