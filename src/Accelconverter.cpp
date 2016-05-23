@@ -109,10 +109,22 @@ void Accel_converter::profileGenerator(Movement_Vector Dvect, Gcode::Class_EtatM
 		uint64_t		acc_dist;
 		uint64_t		acc_temps;
 		int64_t 		dist;
-		uint64_t 		temps_mouvement;
 		biggest_axes	name_of_axis;
 	}axe_prioritaire;
 
+	struct {
+		uint64_t x = 0;
+		uint64_t y = 0;
+		uint64_t z = 0;
+		uint64_t a = 0;
+	}_acc_temps;
+
+	struct {
+		uint64_t x = 0;
+		uint64_t y = 0;
+		uint64_t z = 0;
+		uint64_t a = 0;
+	}_acc_distance;
 
 	int32_t accel_x,accel_y,accel_z;
 
@@ -122,10 +134,10 @@ void Accel_converter::profileGenerator(Movement_Vector Dvect, Gcode::Class_EtatM
 	uint64_t epoch_end;
 
 
-	uint64_t temps_mouvement_X;
+	/*uint64_t temps_mouvement_X;
 	uint64_t temps_mouvement_Y;
 	uint64_t temps_mouvement_Z;
-	uint64_t temps_mouvement_A;
+	uint64_t temps_mouvement_A;*/
 	double facteur_reduc_acc_x; double facteur_reduc_acc_z;
 	double facteur_reduc_acc_y; double facteur_reduc_acc_a;
 
@@ -139,35 +151,31 @@ void Accel_converter::profileGenerator(Movement_Vector Dvect, Gcode::Class_EtatM
 		_vitesse_X = Etat->VitesseDeplacement_X; _vitesse_Y = Etat->VitesseDeplacement_Y;
 		_vitesse_Z = Etat->VitesseDeplacement_Z; _vitesse_A = Etat->VitesseDeplacement_A;
 
-		_acc_distance.x = 0; _acc_temps.x = 0;
-		_acc_distance.y = 0; _acc_temps.y = 0;
-		_acc_distance.z = 0; _acc_temps.z = 0;
-		_acc_distance.a = 0; _acc_temps.a = 0;
+		_acc_temps.x = 0;
+		_acc_temps.y = 0;
+		_acc_temps.z = 0;
+		_acc_temps.a = 0;
 
 
 		// Axe : X
 		_vit_tick.x = vit_mm_to_tick(Etat->VitesseDeplacement_X, x); //Vitesse : changement d'unité (mm/s to tick / tick)
 		if(_acc_tick.x == 0) {_acc_temps.x = 0;}
 		else { _acc_temps.x =  round((double)(_vit_tick.x / _acc_tick.x));}	//Calcul du temps de l'accélération jusqu'a la vitesse voulue (en ticks)
-		_acc_distance.x = (_acc_tick.x / 2) * _acc_temps.x * _acc_temps.x;//Calul de la distance parcourue pendant la phase d'accélération (en tiks)
 
 		// Axe : Y
 		_vit_tick.y = vit_mm_to_tick(Etat->VitesseDeplacement_Y, y); //Vitesse : changement d'unité (mm/s to tick / tick)
 		if(_acc_tick.y == 0) {_acc_temps.y = 0;}
 		else { _acc_temps.y =  round((double)(_vit_tick.y / _acc_tick.y));}	//Calcul du temps de l'accélération jusqu'a la vitesse voulue (en ticks)
-		_acc_distance.y = (_acc_tick.y / 2) * _acc_temps.y * _acc_temps.y;//Calul de la distance parcourue pendant la phase d'accélération (en tiks)
 
 		// Axe : Z
 		_vit_tick.z = vit_mm_to_tick(Etat->VitesseDeplacement_Z, z); //Vitesse : changement d'unité (mm/s to tick / tick)
 		if(_acc_tick.z == 0) {_acc_temps.z = 0;}
 		else { _acc_temps.z =  round((double)(_vit_tick.z / _acc_tick.z));}	//Calcul du temps de l'accélération jusqu'a la vitesse voulue (en ticks)
-		_acc_distance.z = (_acc_tick.z / 2) * _acc_temps.z * _acc_temps.z;//Calul de la distance parcourue pendant la phase d'accélération (en tiks)
 
 		// Axe : A
 		_vit_tick.a = vit_mm_to_tick(Etat->VitesseDeplacement_A, a); //Vitesse : changement d'unité (mm/s to tick / tick)
 		if(_acc_tick.a == 0) {_acc_temps.a = 0;}
 		else { _acc_temps.a =  round((double)(_vit_tick.a / _acc_tick.a));}	//Calcul du temps de l'accélération jusqu'a la vitesse voulue (en ticks)
-		_acc_distance.a = (_acc_tick.a / 2) * _acc_temps.a * _acc_temps.a;//Calul de la distance parcourue pendant la phase d'accélération (en tiks)
 
 
 #if DISPLAY_GENE_VECTOR == 1
@@ -177,133 +185,73 @@ void Accel_converter::profileGenerator(Movement_Vector Dvect, Gcode::Class_EtatM
 		cout << "Accélération de            : " << _acc_tick.x << endl;
 		cout << "Vitesse cible              : " << _vit_tick.x << endl;
 		cout << "Temps de l'accélération    : " << _acc_temps.x << endl;
-		cout << "Distance parcourue         : " << _acc_distance.x << endl<<endl;
 
 		cout << "Axe                        : Y" << endl;
 		cout << "Accélération de            : " << _acc_tick.y << endl;
 		cout << "Vitesse cible              : " << _vit_tick.y << endl;
 		cout << "Temps de l'accélération    : " << _acc_temps.y << endl;
-		cout << "Distance parcourue         : " << _acc_distance.y << endl<<endl;
 
 		cout << "Axe                        : Z" << endl;
 		cout << "Accélération de            : " << _acc_tick.z << endl;
 		cout << "Vitesse cible              : " << _vit_tick.z << endl;
 		cout << "Temps de l'accélération    : " << _acc_temps.z << endl;
-		cout << "Distance parcourue         : " << _acc_distance.z << endl<<endl;
 
 		cout << "Axe                        : A" << endl;
 		cout << "Accélération de            : " << _acc_tick.a << endl;
 		cout << "Vitesse cible              : " << _vit_tick.a << endl;
 		cout << "Temps de l'accélération    : " << _acc_temps.a << endl;
-		cout << "Distance parcourue         : " << _acc_distance.a << endl<<endl;
 #endif
 	}
 
 
-	//Calcul le temps que pouraient mettre chaque axe à bouger s'ils étaient seuls (sans facteur de correction)
-	if((uint64_t)abs(Dvect.Dep_x)>_acc_distance.x*2) //si on peut faire 3 phases (acc ---- desc)
-	{
-		temps_mouvement_X = _vit_tick.x>0?_acc_temps.x * 2 + (abs(Dvect.Dep_x) / _vit_tick.x - _acc_temps.x * 2):0;
-	}
-	else
-	{
-		temps_mouvement_X =  _acc_tick.x>0?sqrt((double)(abs(Dvect.Dep_x) / _acc_tick.x)) * 2:0;
-	}
-
-	if((uint64_t)abs(Dvect.Dep_y)>_acc_distance.y*2) //si on peut faire 3 phases (acc ---- desc)
-	{
-		temps_mouvement_Y = _acc_temps.y * 2 + (abs(Dvect.Dep_y) / _vit_tick.y - _acc_temps.y * 2);
-	}
-	else
-	{
-		temps_mouvement_Y = sqrt((double)(abs(Dvect.Dep_y) / _acc_tick.y)) * 2;
-	}
-
-	if((uint64_t)abs(Dvect.Dep_z)>_acc_distance.z*2) //si on peut faire 3 phases (acc ---- desc)
-	{
-		temps_mouvement_Z = _acc_temps.z * 2 + (abs(Dvect.Dep_z) / _vit_tick.z - _acc_temps.z * 2);
-	}
-	else
-	{
-		temps_mouvement_Z = sqrt((double)(abs(Dvect.Dep_z) / _acc_tick.z)) * 2;
-	}
-
-	if((uint64_t)abs(Dvect.Dep_a)>_acc_distance.a*2) //si on peut faire 3 phases (acc ---- desc)
-	{
-		temps_mouvement_A =_vit_tick.a>0? _acc_temps.a * 2 + (abs(Dvect.Dep_a) / _vit_tick.a - _acc_temps.a * 2):0;
-	}
-	else
-	{
-		temps_mouvement_A =_acc_tick.a>0? sqrt((double)(abs(Dvect.Dep_a) / _acc_tick.a)) * 2:0;
-	}
-
-	cout << "Temps du mouvement sur l'axe X : " << temps_mouvement_X << endl;
-	cout << "Temps du mouvement sur l'axe Y : " << temps_mouvement_Y << endl;
-	cout << "Temps du mouvement sur l'axe Z : " << temps_mouvement_Z << endl;
-	cout << "Temps du mouvement sur l'axe A : " << temps_mouvement_A << endl;
-
-	//Recherche de l'axe prioritaire (temps de mouvement le plus long)
-	if(temps_mouvement_Y > temps_mouvement_X){
-		if(temps_mouvement_Z > temps_mouvement_Y)
+	//Recherche de l'axe prioritaire (temps d'accélération le plus long)
+	if(_acc_temps.y > _acc_temps.x){
+		if(_acc_temps.z > _acc_temps.y)
 		{
 			cout << "Axe prioritaire : Z" << endl;
 			axe_prioritaire.name_of_axis = Z;
-			axe_prioritaire.acc_dist = _acc_distance.z;
 			axe_prioritaire.acc_temps = _acc_temps.z;
 			axe_prioritaire.acc = _acc_tick.z;
 			axe_prioritaire.vit = _vit_tick.z;
 			axe_prioritaire.dist = Dvect.Dep_z;
-			axe_prioritaire.temps_mouvement = temps_mouvement_Z;
-
-			//baxes=z;
-			//bigestcoord=Dvect.Dep_z;
 		}
 		else
 		{
 			cout << "Axe prioritaire : Y" << endl;
 			axe_prioritaire.name_of_axis = Y;
-			axe_prioritaire.acc_dist = _acc_distance.y;
 			axe_prioritaire.acc_temps = _acc_temps.y;
 			axe_prioritaire.acc = _acc_tick.y;
 			axe_prioritaire.vit = _vit_tick.y;
 			axe_prioritaire.dist = Dvect.Dep_y;
-			axe_prioritaire.temps_mouvement = temps_mouvement_Y;
-
-			//baxes=y;
-			//bigestcoord=Dvect.Dep_y;
 		}
 	}
-	else if(temps_mouvement_Z > temps_mouvement_X){
+	else if(_acc_temps.z > _acc_temps.x){
 		cout << "Axe prioritaire : Z" << endl;
 		axe_prioritaire.name_of_axis = Z;
-		axe_prioritaire.acc_dist = _acc_distance.z;
 		axe_prioritaire.acc_temps = _acc_temps.z;
 		axe_prioritaire.acc = _acc_tick.z;
 		axe_prioritaire.vit = _vit_tick.z;
 		axe_prioritaire.dist = Dvect.Dep_z;
-		axe_prioritaire.temps_mouvement = temps_mouvement_Z;
-
-		//baxes=z;
-		//bigestcoord=Dvect.Dep_z;
 	}
 	else {
 		cout << "Axe prioritaire : X" << endl;
 		axe_prioritaire.name_of_axis = X;
-		axe_prioritaire.acc_dist = _acc_distance.x;
 		axe_prioritaire.acc_temps = _acc_temps.x;
 		axe_prioritaire.acc = _acc_tick.x;
 		axe_prioritaire.vit = _vit_tick.x;
 		axe_prioritaire.dist = Dvect.Dep_x;
-		axe_prioritaire.temps_mouvement = temps_mouvement_X;
 	}
+
+	axe_prioritaire.acc_dist = (axe_prioritaire.acc / 2) * axe_prioritaire.acc_temps * axe_prioritaire.acc_temps;
+
 
 
 	cout << endl << "Calcul des facteurs de réduction des accélérations : " << endl;
 
-	facteur_reduc_acc_x = (double)((long double)(4 * abs(Dvect.Dep_x)) / (long double)(_acc_tick.x==0?1:(long double)_acc_tick.x * (long double)axe_prioritaire.temps_mouvement * (long double)axe_prioritaire.temps_mouvement));
-	facteur_reduc_acc_y = (double)((long double)(4 * abs(Dvect.Dep_y)) / (long double)(_acc_tick.y==0?1:(long double)_acc_tick.y * (long double)axe_prioritaire.temps_mouvement * (long double)axe_prioritaire.temps_mouvement));
-	facteur_reduc_acc_z = (double)((long double)(4 * abs(Dvect.Dep_z)) / (long double)(_acc_tick.z==0?1:(long double)_acc_tick.z * (long double)axe_prioritaire.temps_mouvement * (long double)axe_prioritaire.temps_mouvement));
-	facteur_reduc_acc_a = (double)((long double)(4 * abs(Dvect.Dep_a)) / (long double)(_acc_tick.a==0?1:(long double)_acc_tick.a * (long double)axe_prioritaire.temps_mouvement * (long double)axe_prioritaire.temps_mouvement));
+	facteur_reduc_acc_x = (double)((double)_vit_tick.x / (double)((_acc_tick.x==0?1:_acc_tick.x) * (axe_prioritaire.acc_temps==0?1:axe_prioritaire.acc_temps)));
+	facteur_reduc_acc_y = (double)((double)_vit_tick.y / (double)((_acc_tick.y==0?1:_acc_tick.y) * (axe_prioritaire.acc_temps==0?1:axe_prioritaire.acc_temps)));
+	facteur_reduc_acc_z = (double)((double)_vit_tick.z / (double)((_acc_tick.z==0?1:_acc_tick.z) * (axe_prioritaire.acc_temps==0?1:axe_prioritaire.acc_temps)));
+	facteur_reduc_acc_a = (double)((double)_vit_tick.a / (double)((_acc_tick.a==0?1:_acc_tick.a) * (axe_prioritaire.acc_temps==0?1:axe_prioritaire.acc_temps)));
 
 	cout << "facteur axe X : " << facteur_reduc_acc_x <<endl;
 	cout << "facteur axe Y : " << facteur_reduc_acc_y <<endl;
@@ -314,45 +262,33 @@ void Accel_converter::profileGenerator(Movement_Vector Dvect, Gcode::Class_EtatM
 
 	if((uint64_t)abs(axe_prioritaire.dist)>axe_prioritaire.acc_dist*2)
 		{
-
-		// A finir !!!! changer les variable par la structure axeprioritaire
-		// Simplifier en ajoutant peut être directement les structure des axe choisies (_acc et _vit ??)
-
-			epoch_present+=axe_prioritaire.acc_temps;
-
-			epoch_end_accel=epoch_present;
 			switch(axe_prioritaire.name_of_axis)
 					{
 					case X:
 						accel_x=axe_prioritaire.dist>0?axe_prioritaire.acc:-axe_prioritaire.acc;
 						accel_y=Dvect.Dep_y==0?0:(int32_t)((double)_acc_tick.y * facteur_reduc_acc_y);
 						accel_z=Dvect.Dep_z==0?0:(int32_t)((double)_acc_tick.z * facteur_reduc_acc_z);
-
-						epoch_present += (double)(abs(axe_prioritaire.dist) - 2 * axe_prioritaire.acc_dist) / (double)axe_prioritaire.vit; //peut etre une erreure ??
-						epoch_end_conti=epoch_present;
-
 						break;
 					case Y:
-
-						accel_y=Dvect.Dep_y>0?accelDeccel:-accelDeccel;
-						accel_x=Dvect.Dep_x==0?0:(double)((double)accelDeccel*(double)((double)Dvect.Dep_x/(double)(abs(Dvect.Dep_y))));
-						accel_z=Dvect.Dep_z==0?0:(double)((double)accelDeccel*(double)((double)Dvect.Dep_z/(double)(abs(Dvect.Dep_y))));
-						epoch_end_conti=epoch_present+=(double)((double)(abs(Dvect.Dep_y)-2*Dtick_to_accel)/(double)Vmax);
-
+						accel_y=axe_prioritaire.dist>0?axe_prioritaire.acc:-axe_prioritaire.acc;
+						accel_x=Dvect.Dep_x==0?0:(int32_t)((double)_acc_tick.x * facteur_reduc_acc_x);
+						accel_z=Dvect.Dep_z==0?0:(int32_t)((double)_acc_tick.z * facteur_reduc_acc_z);
 						break;
 					case Z:
-						accel_z=Dvect.Dep_z>0?accelDeccel:-accelDeccel;
-						accel_x=Dvect.Dep_x==0?0:(double)((double)accelDeccel*(double)((double)Dvect.Dep_x/(double)(abs(Dvect.Dep_z))));
-						accel_y=Dvect.Dep_y==0?0:(double)((double)accelDeccel*(double)((double)Dvect.Dep_y/(double)(abs(Dvect.Dep_z))));
-						epoch_end_conti=epoch_present+=(double)((double)(abs(Dvect.Dep_z)-2*Dtick_to_accel)/(double)Vmax);
-
+						accel_z=axe_prioritaire.dist>0?axe_prioritaire.acc:-axe_prioritaire.acc;
+						accel_x=Dvect.Dep_x==0?0:(int32_t)((double)_acc_tick.x * facteur_reduc_acc_x);
+						accel_y=Dvect.Dep_y==0?0:(int32_t)((double)_acc_tick.y * facteur_reduc_acc_y);
 						break;
 					case A:
 						break;
-
 					}
-			epoch_present += axe_prioritaire.acc_temps;
-			epoch_end=epoch_present;
+
+
+			epoch_end_accel = epoch_begin + axe_prioritaire.acc_temps;
+			epoch_end_conti = epoch_end_accel + (double)(abs(axe_prioritaire.dist) - 2 * axe_prioritaire.acc_dist) / (double)axe_prioritaire.vit; //peut etre une erreure ??
+			epoch_end = epoch_end_conti + axe_prioritaire.acc_temps;
+			epoch_present = epoch_end;
+
 			Accel_vectors.push_back(new Accel_vector(accel_x,accel_y,accel_z,0,epoch_begin,epoch_end_accel));
 			Accel_vectors.push_back(new Accel_vector(0,0,0,0,epoch_end_accel,epoch_end_conti));
 			Accel_vectors.push_back(new Accel_vector(-accel_x,-accel_y,-accel_z,0,epoch_end_conti,epoch_end));
@@ -360,16 +296,9 @@ void Accel_converter::profileGenerator(Movement_Vector Dvect, Gcode::Class_EtatM
 		}
 	else
 	{
-		uint64_t time_accel=0;
-
-		time_accel = sqrt((double)((double)(abs(axe_prioritaire.dist)) / (double)axe_prioritaire.acc));
-		epoch_present+=time_accel;
-
-		epoch_end_accel = epoch_present;
 					switch(axe_prioritaire.name_of_axis)
 							{
 							case X:
-
 								accel_x=axe_prioritaire.dist>0?axe_prioritaire.acc:-axe_prioritaire.acc;//todo gestion si deplacement x00y00z00
 								accel_y=Dvect.Dep_y==0?0:(int32_t)((double)_acc_tick.y * facteur_reduc_acc_y);
 								accel_z=Dvect.Dep_z==0?0:(int32_t)((double)_acc_tick.z * facteur_reduc_acc_z);
@@ -388,8 +317,13 @@ void Accel_converter::profileGenerator(Movement_Vector Dvect, Gcode::Class_EtatM
 								break;
 
 							}
-					epoch_present+=time_accel;
-					epoch_end = epoch_present;
+
+					uint64_t time_accel=0;
+
+					time_accel = sqrt((double)((double)(abs(axe_prioritaire.dist)) / (double)axe_prioritaire.acc));
+
+					epoch_end_accel = epoch_begin + time_accel;
+					epoch_end = epoch_end_accel + time_accel;
 					Accel_vectors.push_back(new Accel_vector(accel_x,accel_y,accel_z,0,epoch_begin,epoch_end_accel));
 					Accel_vectors.push_back(new Accel_vector(-accel_x,-accel_y,-accel_z,0,epoch_end_accel,epoch_end));
 	}
@@ -407,27 +341,24 @@ bool Accel_converter::generate_tick_vector(Gcode::TabEtatMachine & tabetat) {
 	Movement_Vector prevvect(0,0,0,0);
 	unsigned int iter=0;
 	Accel_vectors.push_back(new Accel_vector(0,0,0,0,0,epoch_present+=1000));//empty begin vector
-	Gcode::TabEtatMachine::iterator it2 = tabetat.begin();
 	for(Gcode::TabEtatMachine::iterator it = tabetat.begin(); it != tabetat.end(); it++) {
 	    if((*it)->Deplacement==false) continue;
 	    if(first)
 	    {
-	    	cout << "mmToTick((*it)->PosOutil_X, x) - 2^64 : " << mmToTick((*it)->PosOutil_X, x) - pow(2,64) << endl << endl;
 	    	vect.SetVector(	mmToTick((*it)->PosOutil_X, x),mmToTick((*it)->PosOutil_Y, y),
 	    					mmToTick((*it)->PosOutil_Z, z),mmToTick((*it)->PosOutil_A, a));
 	    }
 	    else
 	    {
-	    	vect.SetVector(	mmToTick((*it)->PosOutil_X - (*it2)->PosOutil_X, x),mmToTick((*it)->PosOutil_Y - (*it2)->PosOutil_Y, y),
-	    		    		mmToTick((*it)->PosOutil_Z - (*it2)->PosOutil_Z, z),mmToTick((*it)->PosOutil_A - (*it2)->PosOutil_A, a));
-	    	it2++;
+	    	vect.SetVector(	mmToTick((*it)->PosOutil_X, x) - prevvect.Dep_x, mmToTick((*it)->PosOutil_Y, y) - prevvect.Dep_y,
+	    		    		mmToTick((*it)->PosOutil_Z, z) - prevvect.Dep_z, mmToTick((*it)->PosOutil_A, a) - prevvect.Dep_a);
+	    	//it2++;
 	    }
 	    	prevvect.SetVector(	mmToTick((*it)->PosOutil_X, x),mmToTick((*it)->PosOutil_Y, y),
 					mmToTick((*it)->PosOutil_Z, z),mmToTick((*it)->PosOutil_A, a));
 	    profileGenerator(vect, (*it));
 	    first=false;
 	    iter++;
-    	//cout << "\rgenerated vectors : " << (int)((float)((iter*100.0)/tabetat.size())) << "%" << flush;
 	}
 	Accel_vectors.push_back(new Accel_vector(0,0,0,0,epoch_present,epoch_present+1000));//empty end vector
 	Accel_vectors.push_back(new Accel_vector(0,0,0,0,epoch_present+1000,epoch_present+2000));//empty end vector

@@ -32,7 +32,7 @@ class Accel_converter {
 private:
 	uint64_t epoch_present=0;
 	typedef enum axes{x,y,z,a} Axis;
-	const uint64_t _Tick_per_pulse = 0x1000000000000; //= 0x100000000000;
+	const uint64_t _Tick_per_pulse = 0x100000000000; //= 0x100000000000;
 	uint64_t mmToTick(double val,  Axis axe);
 
 	uint64_t acc_mm_to_tick(float mm_per_second_square, Axis axe);
@@ -70,19 +70,7 @@ private:
 		uint64_t a = 0;
 	}_vit_tick;
 
-	struct {
-		uint64_t x = 0;
-		uint64_t y = 0;
-		uint64_t z = 0;
-		uint64_t a = 0;
-	}_acc_temps;
 
-	struct {
-		uint64_t x = 0;
-		uint64_t y = 0;
-		uint64_t z = 0;
-		uint64_t a = 0;
-	}_acc_distance;
 
 	/*struct Axe { // temps et distance d'accélération en tick
 		struct {

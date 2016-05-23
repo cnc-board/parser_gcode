@@ -12,7 +12,7 @@
 
 enum errors
 {
-	NoErr, CanNotOpenFile, geneBin, CmdInconnue, MissingParam, ModeDistanceNonDef, MvSur3ou4AxesNonPrisEnCharge
+	NoErr, CanNotOpenFile, geneBin, CmdInconnue, MissingParam, ModeDistanceNonDef, MvSur3ou4AxesNonPrisEnCharge, DeplacementDeZero
 };
 
 

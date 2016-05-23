@@ -154,6 +154,8 @@ void Gcode::parser()
 					case MvSur3ou4AxesNonPrisEnCharge:
 						cout << "Mouvement sur plus de deux axes simultanément non pris en charge" << endl;
 						break;
+					case DeplacementDeZero:
+						cout << "Déplacement null (0 mm sur tous les axes)" << endl;
 					default:
 						break;
 					}
@@ -338,12 +340,22 @@ void Gcode::Deplacement_G00_G01(string line, bool G00)
 	//errors err = NoErr;
 	float Xvalue = 0, Yvalue = 0, Zvalue = 0, Avalue = 0;
 
+	double alpha;
+
 	//Création de l'ete courant (initialisation par def dans le constructeur)
 	//S'il éxiste déja un etat dans le tableau, copy dans l'etat courant
 	Class_EtatMachine * EtatMachine = new Class_EtatMachine(*this);
 	int test = _TabEtatMachine.size();
 	if (test != 0)
 		EtatMachine->Copy(*_TabEtatMachine[test - 1]);
+
+	Class_EtatMachine* dernier_etat = NULL;
+	if(_TabEtatMachine.size() != 0) //S'il il y a un autre etat_machine dans le tableau
+		{
+			//Récupération de l'état précédent
+			dernier_etat = _TabEtatMachine[_TabEtatMachine.size()-1];
+		}
+
 
 	//Action de déplacement broche (pas de parametrage)
 	EtatMachine->Deplacement = true;
@@ -379,19 +391,18 @@ void Gcode::Deplacement_G00_G01(string line, bool G00)
 		throw Err(ModeDistanceNonDef);
 
 
+	if(dernier_etat->PosOutil_X == EtatMachine->PosOutil_X && dernier_etat->PosOutil_Y == EtatMachine->PosOutil_Y &&
+	   dernier_etat->PosOutil_Z == EtatMachine->PosOutil_Z && dernier_etat->PosOutil_A == EtatMachine->PosOutil_A)
+		throw Err(DeplacementDeZero);
 
-	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	// mofifier la vitesse pour adapter la vitesse en diagonal !!!
-	double alpha;
+
+
 
 	if(testX || testY) //calcul de l'angle formé par le déplacement
 	{
 
-		if(TabEtatMachine().size() != 0) //S'il il y a un autre etat machine dans le tableau (obtention du déplacement par rapport à ce dernier)
+		if(dernier_etat != NULL) //S'il il y a un autre etat machine dans le tableau (obtention du déplacement par rapport à ce dernier)
 		{
-
-			Class_EtatMachine* dernier_etat = _TabEtatMachine[_TabEtatMachine.size()-1];
 			alpha = atan((EtatMachine->PosOutil_Y - dernier_etat->PosOutil_Y) / (EtatMachine->PosOutil_X - dernier_etat->PosOutil_X));
 		}
 		else
@@ -399,6 +410,7 @@ void Gcode::Deplacement_G00_G01(string line, bool G00)
 			alpha = atan(EtatMachine->PosOutil_Y / EtatMachine->PosOutil_X);
 		}
 	}
+
 
 	//Modification vitesse d'avance
 	if (testZ)
