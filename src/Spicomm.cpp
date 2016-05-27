@@ -16,7 +16,7 @@ Spi_comm::Spi_comm(bool simulate):Simulation_mode(simulate) {
 	cout << "Opening SPI ... " << flush;
 	if(Simulation_mode==false)
 	{
-		fd = open("/dev/spidev32766.2", O_RDWR);
+		fd = open("/dev/spidev32766.0", O_RDWR);
 		if (fd < 0) {
 			cerr << "can't open device" << endl;
 			exit(-1);

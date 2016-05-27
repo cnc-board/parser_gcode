@@ -6,6 +6,7 @@
  */
 
 #include <cmath>
+#include <iomanip>
 #include "../headers/Accelconverter.h"
 #include "../headers/Spicomm.h"
 #include "../headers/Gcode.h"
@@ -135,15 +136,13 @@ void Accel_converter::profileGenerator(Movement_Vector Dvect, Gcode::Class_EtatM
 	uint64_t epoch_end;
 
 
-	/*uint64_t temps_mouvement_X;
-	uint64_t temps_mouvement_Y;
-	uint64_t temps_mouvement_Z;
-	uint64_t temps_mouvement_A;*/
 	double facteur_reduc_acc_x; double facteur_reduc_acc_z;
 	double facteur_reduc_acc_y; double facteur_reduc_acc_a;
 
+#if DISPLAY_GENE_VECTOR == 1
 	cout << endl << "Calcul du vecteur N°" << nb << "  -----------------------------------------------------" << endl << endl;
 	nb++;
+#endif
 
 	if(_vitesse_X != Etat->VitesseDeplacement_X || _vitesse_Y != Etat->VitesseDeplacement_Y
 			|| _vitesse_Z != Etat->VitesseDeplacement_Z || _vitesse_A != Etat->VitesseDeplacement_A)
@@ -158,25 +157,31 @@ void Accel_converter::profileGenerator(Movement_Vector Dvect, Gcode::Class_EtatM
 		_acc_temps.a = 0;
 
 
-		// Axe : X
+		// Axe : Y
 		_vit_tick.x = vit_mm_to_tick(Etat->VitesseDeplacement_X, x); //Vitesse : changement d'unité (mm/s to tick / tick)
 		if(_acc_tick.x == 0) {_acc_temps.x = 0;}
 		else { _acc_temps.x =  round((double)(_vit_tick.x / _acc_tick.x));}	//Calcul du temps de l'accélération jusqu'a la vitesse voulue (en ticks)
+		//_vit_tick.x = _acc_tick.x * _acc_temps.x;
+
+
 
 		// Axe : Y
 		_vit_tick.y = vit_mm_to_tick(Etat->VitesseDeplacement_Y, y); //Vitesse : changement d'unité (mm/s to tick / tick)
 		if(_acc_tick.y == 0) {_acc_temps.y = 0;}
 		else { _acc_temps.y =  round((double)(_vit_tick.y / _acc_tick.y));}	//Calcul du temps de l'accélération jusqu'a la vitesse voulue (en ticks)
 
+
 		// Axe : Z
 		_vit_tick.z = vit_mm_to_tick(Etat->VitesseDeplacement_Z, z); //Vitesse : changement d'unité (mm/s to tick / tick)
 		if(_acc_tick.z == 0) {_acc_temps.z = 0;}
 		else { _acc_temps.z =  round((double)(_vit_tick.z / _acc_tick.z));}	//Calcul du temps de l'accélération jusqu'a la vitesse voulue (en ticks)
 
+
 		// Axe : A
 		_vit_tick.a = vit_mm_to_tick(Etat->VitesseDeplacement_A, a); //Vitesse : changement d'unité (mm/s to tick / tick)
 		if(_acc_tick.a == 0) {_acc_temps.a = 0;}
 		else { _acc_temps.a =  round((double)(_vit_tick.a / _acc_tick.a));}	//Calcul du temps de l'accélération jusqu'a la vitesse voulue (en ticks)
+
 
 
 #if DISPLAY_GENE_VECTOR == 1
@@ -186,6 +191,9 @@ void Accel_converter::profileGenerator(Movement_Vector Dvect, Gcode::Class_EtatM
 		cout << "Accélération de            : " << _acc_tick.x << endl;
 		cout << "Vitesse cible              : " << _vit_tick.x << endl;
 		cout << "Temps de l'accélération    : " << _acc_temps.x << endl;
+		cout << "Temps de l'accélération f  : " << setprecision(16) << acc_temps<< endl;
+		cout << "déplacement                : " << Dvect.Dep_x << endl;
+		cout << "distance d'acc             : " << (_acc_tick.x / 2) * _acc_temps.x * _acc_temps.x << endl;
 
 		cout << "Axe                        : Y" << endl;
 		cout << "Accélération de            : " << _acc_tick.y << endl;
@@ -209,7 +217,9 @@ void Accel_converter::profileGenerator(Movement_Vector Dvect, Gcode::Class_EtatM
 	if(_acc_temps.y > _acc_temps.x){
 		if(_acc_temps.z > _acc_temps.y)
 		{
+#if DISPLAY_GENE_VECTOR == 1
 			cout << "Axe prioritaire : Z" << endl;
+#endif
 			axe_prioritaire.name_of_axis = Z;
 			axe_prioritaire.acc_temps = _acc_temps.z;
 			axe_prioritaire.acc = _acc_tick.z;
@@ -218,7 +228,9 @@ void Accel_converter::profileGenerator(Movement_Vector Dvect, Gcode::Class_EtatM
 		}
 		else
 		{
+#if DISPLAY_GENE_VECTOR == 1
 			cout << "Axe prioritaire : Y" << endl;
+#endif
 			axe_prioritaire.name_of_axis = Y;
 			axe_prioritaire.acc_temps = _acc_temps.y;
 			axe_prioritaire.acc = _acc_tick.y;
@@ -227,7 +239,10 @@ void Accel_converter::profileGenerator(Movement_Vector Dvect, Gcode::Class_EtatM
 		}
 	}
 	else if(_acc_temps.z > _acc_temps.x){
+
+#if DISPLAY_GENE_VECTOR == 1
 		cout << "Axe prioritaire : Z" << endl;
+#endif
 		axe_prioritaire.name_of_axis = Z;
 		axe_prioritaire.acc_temps = _acc_temps.z;
 		axe_prioritaire.acc = _acc_tick.z;
@@ -235,7 +250,9 @@ void Accel_converter::profileGenerator(Movement_Vector Dvect, Gcode::Class_EtatM
 		axe_prioritaire.dist = Dvect.Dep_z;
 	}
 	else {
+#if DISPLAY_GENE_VECTOR == 1
 		cout << "Axe prioritaire : X" << endl;
+#endif
 		axe_prioritaire.name_of_axis = X;
 		axe_prioritaire.acc_temps = _acc_temps.x;
 		axe_prioritaire.acc = _acc_tick.x;
@@ -246,18 +263,21 @@ void Accel_converter::profileGenerator(Movement_Vector Dvect, Gcode::Class_EtatM
 	axe_prioritaire.acc_dist = (axe_prioritaire.acc / 2) * axe_prioritaire.acc_temps * axe_prioritaire.acc_temps;
 
 
-
+#if DISPLAY_GENE_VECTOR == 1
 	cout << endl << "Calcul des facteurs de réduction des accélérations : " << endl;
+#endif
 
 	facteur_reduc_acc_x = (double)((double)_vit_tick.x / (double)((_acc_tick.x==0?1:_acc_tick.x) * (axe_prioritaire.acc_temps==0?1:axe_prioritaire.acc_temps)));
 	facteur_reduc_acc_y = (double)((double)_vit_tick.y / (double)((_acc_tick.y==0?1:_acc_tick.y) * (axe_prioritaire.acc_temps==0?1:axe_prioritaire.acc_temps)));
 	facteur_reduc_acc_z = (double)((double)_vit_tick.z / (double)((_acc_tick.z==0?1:_acc_tick.z) * (axe_prioritaire.acc_temps==0?1:axe_prioritaire.acc_temps)));
 	facteur_reduc_acc_a = (double)((double)_vit_tick.a / (double)((_acc_tick.a==0?1:_acc_tick.a) * (axe_prioritaire.acc_temps==0?1:axe_prioritaire.acc_temps)));
 
+#if DISPLAY_GENE_VECTOR == 1
 	cout << "facteur axe X : " << facteur_reduc_acc_x <<endl;
 	cout << "facteur axe Y : " << facteur_reduc_acc_y <<endl;
 	cout << "facteur axe Z : " << facteur_reduc_acc_z <<endl;
 	cout << "facteur axe A : " << facteur_reduc_acc_a <<endl;
+#endif
 
 	epoch_begin=epoch_present;
 
@@ -328,10 +348,6 @@ void Accel_converter::profileGenerator(Movement_Vector Dvect, Gcode::Class_EtatM
 					Accel_vectors.push_back(new Accel_vector(accel_x,accel_y,accel_z,0,epoch_begin,epoch_end_accel));
 					Accel_vectors.push_back(new Accel_vector(-accel_x,-accel_y,-accel_z,0,epoch_end_accel,epoch_end));
 	}
-
-
-
-
 }
 
 
@@ -353,7 +369,6 @@ bool Accel_converter::generate_tick_vector(Gcode::TabEtatMachine & tabetat) {
 	    {
 	    	vect.SetVector(	mmToTick((*it)->PosOutil_X, x) - prevvect.Dep_x, mmToTick((*it)->PosOutil_Y, y) - prevvect.Dep_y,
 	    		    		mmToTick((*it)->PosOutil_Z, z) - prevvect.Dep_z, mmToTick((*it)->PosOutil_A, a) - prevvect.Dep_a);
-	    	//it2++;
 	    }
 	    	prevvect.SetVector(	mmToTick((*it)->PosOutil_X, x),mmToTick((*it)->PosOutil_Y, y),
 					mmToTick((*it)->PosOutil_Z, z),mmToTick((*it)->PosOutil_A, a));
@@ -371,6 +386,38 @@ bool Accel_converter::generate_tick_vector(Gcode::TabEtatMachine & tabetat) {
 
 void Accel_converter::print()
 {
+	/*uint64_t v = 0, p = 0, Ttick_to_acceldeccel=0, speed=0, Dtick_to_acceldeccel=0;
+
+
+	do
+	{
+		Ttick_to_acceldeccel++;
+		speed+=accelDeccel;
+		Dtick_to_acceldeccel+=speed;
+	} while (speed<Vmax);
+
+
+	for(int64_t time_accel=0; dist_accel<target; time_accel+=1)
+		{
+			speed+=accelDeccel;
+			dist_accel+=speed;
+		}
+
+
+		deltap=(a*dt^2)/2
+		dt²=sqrt((deltap/a)*2)
+		do
+		{
+			time_accel++;
+			speed+=accelDeccel;
+			dist_accel+=speed;
+		} while (dist_accel<target);
+
+	do{
+		v = v + 36;
+		p = p + v;
+	}while(1);
+	*/
 	int i;
 	for (i = 0; i < (int)Accel_vectors.size(); i++)
 	{
@@ -394,6 +441,7 @@ void Accel_converter::sendVectors(Spi_comm & comm) {
 	int i=0;
 	char first=1;
 	for(TabAccelVector::iterator it = Accel_vectors.begin(); it != Accel_vectors.end(); it++) {
+		cout << "send vector ok !!!!!" <<endl;
 		comm.transmit_vector(*(*it));
 		i++;
 		if(i>5)

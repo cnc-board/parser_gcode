@@ -46,14 +46,10 @@ private:
 	Limit_machine _Limite_machine;
 
 
-
-
 	void profileGenerator(Movement_Vector Dvect, Gcode::Class_EtatMachine* Etat);
 
 	int32_t accelDeccel=1548;//TODO find a spot to store accel/deccel/vmax params
 	uint64_t Vmax=0x4816f0068; //TODO create profileGen class
-
-
 
 
 	struct {
@@ -70,24 +66,6 @@ private:
 		uint64_t a = 0;
 	}_vit_tick;
 
-
-
-	/*struct Axe { // temps et distance d'accélération en tick
-		struct {
-			uint64_t Accel_X = 0;
-			uint64_t Accel_Y = 0;
-			uint64_t Accel_Z = 0;
-			uint64_t Accel_A = 0;
-		} Temps;
-		struct {
-			uint64_t Accel_X = 0;
-			uint64_t Accel_Y = 0;
-			uint64_t Accel_Z = 0;
-			uint64_t Accel_A = 0;
-		} Distance;
-	};
-
-	Axe _axe;*/
 
 	uint64_t Ttick_to_accel=0;
 			uint64_t Dtick_to_accel=0;
