@@ -191,7 +191,7 @@ void Accel_converter::profileGenerator(Movement_Vector Dvect, Gcode::Class_EtatM
 		cout << "Accélération de            : " << _acc_tick.x << endl;
 		cout << "Vitesse cible              : " << _vit_tick.x << endl;
 		cout << "Temps de l'accélération    : " << _acc_temps.x << endl;
-		cout << "Temps de l'accélération f  : " << setprecision(16) << acc_temps<< endl;
+		//cout << "Temps de l'accélération f  : " << setprecision(16) << acc_temps<< endl;
 		cout << "déplacement                : " << Dvect.Dep_x << endl;
 		cout << "distance d'acc             : " << (_acc_tick.x / 2) * _acc_temps.x * _acc_temps.x << endl;
 
@@ -441,7 +441,7 @@ void Accel_converter::sendVectors(Spi_comm & comm) {
 	int i=0;
 	char first=1;
 	for(TabAccelVector::iterator it = Accel_vectors.begin(); it != Accel_vectors.end(); it++) {
-		cout << "send vector ok !!!!!" <<endl;
+		//cout << "send vector ok !!!!!" <<endl;
 		comm.transmit_vector(*(*it));
 		i++;
 		if(i>5)

@@ -10,7 +10,7 @@
 int main(int argc, char **argv)
 {
 
-	Spi_comm comm(true);
+	Spi_comm comm(false);
 	SignalHandler sighand;
 	sighand.register_exitSignalHandler(&comm);
 	InitMachine EtatInit;
@@ -37,11 +37,11 @@ int main(int argc, char **argv)
 
 	Accel_converter conv(400, 127.896942801, 400, 0.0, lim_machine); //127.896942801 pulse / mm
 	conv.generate_tick_vector(Prog1._TabEtatMachine);
-	conv.print();
+	//conv.print();
 	cout << "Cycle time : " << (conv.Accel_vectors[conv.Accel_vectors.size()-1]->epoch_stop)/(25000000*60)<< " minutes" << endl;
 	comm.execute_reset_off();
 	conv.sendVectors(comm);
-	comm.execute_fifo_list();
+	//comm.execute_fifo_list();
 
 	return 0;
 }

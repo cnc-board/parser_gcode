@@ -17,7 +17,7 @@
 #include "../headers/Movement_Vector.h"
 #include "../headers/Limit_machine.h"
 
-#define DISPLAY_GENE_VECTOR  1
+#define DISPLAY_GENE_VECTOR  0
 
 #define FREQUENCE_FPGA 25000000
 
