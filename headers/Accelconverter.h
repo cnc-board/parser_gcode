@@ -40,7 +40,7 @@ public:
 	bool generate_tick_vector(Gcode::TabEtatMachine& tabetat);
 	void print();
 	void printcsv();
-	void sendVectors(Spi_comm & comm);
+	void sendVectors();
 
 };
 

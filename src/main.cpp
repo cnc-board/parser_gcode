@@ -2,12 +2,13 @@
 #include "../headers/Accelconverter.h"
 #include "../headers/Spicomm.h"
 #include "../headers/SignalHandler.h"
+#include "../headers/CNC_com_driver.h"
 int main(int argc, char **argv)
 {
 
-	Spi_comm comm(false);
-	SignalHandler sighand;
-	sighand.register_exitSignalHandler(&comm);
+	open_driver_comm();
+	//SignalHandler sighand;
+	//sighand.register_exitSignalHandler(&comm);
 	InitMachine EtatInit;
 
 	EtatInit.ModeDistance = Absolues;
@@ -32,8 +33,8 @@ int main(int argc, char **argv)
 	Accel_converter conv;
 	conv.generate_tick_vector(Prog1._TabEtatMachine);
 	cout << "Cycle time : " << (conv.Accel_vectors[conv.Accel_vectors.size()-1]->epoch_stop)/(25000000*60)<< " minutes" << endl;
-	comm.execute_reset_off();
-	conv.sendVectors(comm);
+	execute_reset_off();
+	conv.sendVectors();
 
 	return 0;
 }

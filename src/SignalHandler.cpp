@@ -7,7 +7,7 @@
 
 #include "../headers/SignalHandler.h"
 
-Spi_comm * SignalHandler::comm_channel;
+/*Spi_comm * SignalHandler::comm_channel;
 
 SignalHandler::SignalHandler() {
 }
@@ -24,4 +24,4 @@ void SignalHandler::exitSignalHandler(int _ignored) {
 	std::cerr << "emergency exit ..." << std::endl;
 	comm_channel->send_reset_FPGA();
 	exit(-1);
-}
+}*/

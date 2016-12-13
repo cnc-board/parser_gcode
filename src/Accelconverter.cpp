@@ -7,6 +7,7 @@
 
 #include "../headers/Accelconverter.h"
 #include "../headers/Spicomm.h"
+#include "../headers/CNC_com_driver.h"
 Accel_converter::Accel_converter() {
 	calculateAccelTick();
 }
@@ -213,26 +214,26 @@ void Accel_converter::printcsv() {
 		}
 }
 
-void Accel_converter::sendVectors(Spi_comm & comm) {
+void Accel_converter::sendVectors() {
 	int i=0;
 	char first=1;
 	for(TabAccelVector::iterator it = Accel_vectors.begin(); it != Accel_vectors.end(); it++) {
-		comm.transmit_vector(*(*it));
+		transmit_vector(*(*it));
 		i++;
 		if(i>5)
 		{
 			i=0;
-			while(comm.get_fifo_fill()>70)
+			while(get_fifo_fill()>70)
 			{
 				if(first==1)
 				{
-					comm.execute_fifo_list();
+					execute_fifo_list();
 					first=0;
 				}
-				cout << "\rFIFO fill : " << comm.get_fifo_fill() << "%" <<flush;
+				cout << "\rFIFO fill : " << get_fifo_fill() << "%" <<flush;
 				usleep(250000);
 			}
-			cout << "\rFIFO fill : " << comm.get_fifo_fill() << "%" <<flush;
+			cout << "\rFIFO fill : " << get_fifo_fill() << "%" <<flush;
 		}
 	}
 	cout << "End transmit" << endl;
