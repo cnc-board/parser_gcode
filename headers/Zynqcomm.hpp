@@ -24,20 +24,21 @@
 #define R_control R_0
 #define bit_write_fifo 31
 #define bit_startcycle 30
-int open_driver_comm();
 
-void transmit_vector(Accel_vector& vect);
-
+class Zynq_comm {
+public:
+Zynq_comm(bool simulate);
+virtual ~Zynq_comm();
+void transmit_vector(Accel_vector & vect);
 void execute_fifo_list();
-
 void execute_reset_off();
-
 void send_reset_FPGA();
-
 unsigned int get_fifo_fill();
-
+private:
+int comm_FD=-1;
+bool Simulation_mode=false;
+uint32_t* generator_addr = NULL;
 int check_comm();
-
-int close_driver_comm();
+};
 
 #endif /* ZYNQCOMM_H_ */
