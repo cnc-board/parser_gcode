@@ -349,6 +349,7 @@ void Accel_converter::profileGenerator(Movement_Vector Dvect, Gcode::Class_EtatM
 
 					epoch_end_accel = epoch_begin + time_accel;
 					epoch_end = epoch_end_accel + time_accel;
+					epoch_present = epoch_end;
 					Accel_vectors.push_back(new Accel_vector(accel_x,accel_y,accel_z,0,epoch_begin,epoch_end_accel));
 					Accel_vectors.push_back(new Accel_vector(-accel_x,-accel_y,-accel_z,0,epoch_end_accel,epoch_end));
 	}
