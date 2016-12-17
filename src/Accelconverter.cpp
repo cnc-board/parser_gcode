@@ -452,18 +452,23 @@ void Accel_converter::sendVectors(Zynq_comm & comm) {
 		if(i>5)
 		{
 			i=0;
+			if(first==1)
+			{
+				comm.execute_fifo_list();
+				first=0;
+			}
 			while(comm.get_fifo_fill()>70)
 			{
-				if(first==1)
-				{
-					comm.execute_fifo_list();
-					first=0;
-				}
+
 				cout << "\rFIFO fill : " << comm.get_fifo_fill() << "%" <<flush;
 				usleep(250000);
 			}
 			cout << "\rFIFO fill : " << comm.get_fifo_fill() << "%" <<flush;
 		}
+	}
+	if(first==1)
+	{
+		comm.execute_fifo_list();
 	}
 	cout << "End transmit" << endl;
 }
