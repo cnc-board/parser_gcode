@@ -19,8 +19,8 @@ int open_driver_comm()
 
 void transmit_vector(Accel_vector& vect)
 {
-        generator_addr[R_3]=vect.Accel_y<<16 | vect.Accel_x;
-        generator_addr[R_2]=vect.Accel_a<<16 | vect.Accel_z;
+        generator_addr[R_3]=(vect.Accel_y&0xFFFF)<<16 | (vect.Accel_x&0xFFFF);
+        generator_addr[R_2]=(vect.Accel_a&0xFFFF)<<16 | (vect.Accel_z&0xFFFF);
         generator_addr[R_1]=vect.epoch_stop&0xFFFFFFFF;
         generator_addr[R_0]=(1<<bit_write_fifo)|((vect.epoch_stop>>32)&0xFFFF);
 }

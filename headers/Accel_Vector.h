@@ -19,12 +19,12 @@ using namespace std;
 
 class Accel_vector {
 public:
-Accel_vector(int32_t Accel_x,int32_t Accel_y,int32_t Accel_z,int32_t Accel_a,uint64_t epoch_start,uint64_t epoch_stop);//,uint32_t epoch_stop);
+Accel_vector(int16_t Accel_x,int16_t Accel_y,int16_t Accel_z,int16_t Accel_a,uint64_t epoch_start,uint64_t epoch_stop);//,uint32_t epoch_stop);
 //private:
-	int32_t Accel_x;
-	int32_t Accel_y;
-	int32_t Accel_z;
-	int32_t Accel_a;
+	int16_t Accel_x;
+	int16_t Accel_y;
+	int16_t Accel_z;
+	int16_t Accel_a;
 	uint64_t epoch_start;
 	uint64_t epoch_stop;
 	void printvect();
