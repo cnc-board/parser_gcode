@@ -84,6 +84,7 @@ uint64_t Accel_converter::acc_mm_to_tick(float mm_per_second_square,  Axis axe)
 uint64_t Accel_converter::vit_mm_to_tick(float mm_per_second,  Axis axe)
 {
 	uint64_t ret;
+	mm_per_second=abs(mm_per_second);
 	switch(axe)
 	{
 	case x:
@@ -200,6 +201,8 @@ void Accel_converter::profileGenerator(Movement_Vector Dvect, Gcode::Class_EtatM
 		cout << "Accélération de            : " << _acc_tick.y << endl;
 		cout << "Vitesse cible              : " << _vit_tick.y << endl;
 		cout << "Temps de l'accélération    : " << _acc_temps.y << endl;
+		cout << "déplacement                : " << Dvect.Dep_y << endl;
+		cout << "distance d'acc             : " << (_acc_tick.y / 2) * _acc_temps.y * _acc_temps.y << endl;
 
 		cout << "Axe                        : Z" << endl;
 		cout << "Accélération de            : " << _acc_tick.z << endl;
