@@ -9,6 +9,7 @@
 #include <iomanip>
 #include "../headers/Accelconverter.h"
 #include "../headers/Spicomm.h"
+#include "../headers/Zynqcomm.hpp"
 #include "../headers/Gcode.h"
 
 
@@ -437,7 +438,7 @@ void Accel_converter::printcsv() {
 		}
 }
 
-void Accel_converter::sendVectors(Spi_comm & comm) {
+void Accel_converter::sendVectors(Zynq_comm & comm) {
 	int i=0;
 	char first=1;
 	for(TabAccelVector::iterator it = Accel_vectors.begin(); it != Accel_vectors.end(); it++) {

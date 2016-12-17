@@ -7,7 +7,7 @@
 
 #include "../headers/SignalHandler.h"
 
-Spi_comm * SignalHandler::comm_channel;
+Zynq_comm * SignalHandler::comm_channel;
 
 SignalHandler::SignalHandler() {
 }
@@ -15,7 +15,7 @@ SignalHandler::SignalHandler() {
 SignalHandler::~SignalHandler() {
 }
 
-void SignalHandler::register_exitSignalHandler(Spi_comm * spi) {
+void SignalHandler::register_exitSignalHandler(Zynq_comm * spi) {
 	signal((int) SIGINT, SignalHandler::exitSignalHandler);
 	comm_channel=spi;
 }

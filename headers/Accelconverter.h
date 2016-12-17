@@ -16,6 +16,8 @@
 #include "../headers/Accel_Vector.h"
 #include "../headers/Movement_Vector.h"
 #include "../headers/Limit_machine.h"
+#include "../headers/Spicomm.h"
+#include "../headers/Zynqcomm.hpp"
 
 #define DISPLAY_GENE_VECTOR  0
 
@@ -27,7 +29,7 @@ using namespace std;
 class Accel_vector;
 class Movement_Vector;
 
-class Spi_comm;
+class Zynq_comm;
 class Accel_converter {
 private:
 	uint64_t epoch_present=0;
@@ -78,7 +80,7 @@ public:
 	bool generate_tick_vector(Gcode::TabEtatMachine& tabetat);
 	void print();
 	void printcsv();
-	void sendVectors(Spi_comm & comm);
+	void sendVectors(Zynq_comm & comm);
 
 };
 

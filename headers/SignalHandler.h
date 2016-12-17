@@ -10,14 +10,15 @@
 #include <signal.h>
 #include <iostream>
 #include "../headers/Spicomm.h"
+#include "../headers/Zynqcomm.hpp"
 class SignalHandler {
 public:
 	SignalHandler();
 	virtual ~SignalHandler();
-	void register_exitSignalHandler(Spi_comm * spi);
+	void register_exitSignalHandler(Zynq_comm * spi);
 	static void exitSignalHandler(int _ignored);
 private:
-	static Spi_comm * comm_channel;
+	static Zynq_comm * comm_channel;
 };
 
 

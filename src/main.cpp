@@ -3,14 +3,14 @@
 #include "../headers/Spicomm.h"
 #include "../headers/SignalHandler.h"
 #include "../headers/Limit_machine.h"
-
+#include "../headers/Zynqcomm.hpp"
 
 
 
 int main(int argc, char **argv)
 {
 
-	Spi_comm comm(false);
+	Zynq_comm comm(false);
 	SignalHandler sighand;
 	sighand.register_exitSignalHandler(&comm);
 	InitMachine EtatInit;
