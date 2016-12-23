@@ -37,6 +37,7 @@ void execute_fifo_list();
 void execute_reset_off();
 void send_reset_FPGA();
 unsigned int get_fifo_fill();
+bool get_fifo_empty();
 Position_Vector get_axe_position();
 private:
 int comm_FD=-1;

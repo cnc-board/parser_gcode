@@ -86,6 +86,18 @@ unsigned int Zynq_comm::get_fifo_fill()
   }
 }
 
+bool Zynq_comm::get_fifo_empty()
+{
+  if(Simulation_mode==false)
+  {
+        return generator_addr[R_3]==0;
+  }
+  else
+  {
+        return true;
+  }
+}
+
 Position_Vector Zynq_comm::get_axe_position()
 {
   int32_t x,y,z,a;
