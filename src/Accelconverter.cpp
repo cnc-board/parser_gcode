@@ -362,7 +362,7 @@ bool Accel_converter::generate_tick_vector(Gcode::TabEtatMachine & tabetat) {
 	Movement_Vector vect(0,0,0,0);
 	Movement_Vector prevvect(0,0,0,0);
 	unsigned int iter=0;
-	Accel_vectors.push_back(new Accel_vector(0,0,0,0,0,epoch_present+=1000));//empty begin vector
+	Accel_vectors.push_back(new Accel_vector(0,0,0,0,0,0));//empty begin vector
 	for(Gcode::TabEtatMachine::iterator it = tabetat.begin(); it != tabetat.end(); it++) {
 	    if((*it)->Deplacement==false) continue;
 	    if(first)
@@ -381,8 +381,8 @@ bool Accel_converter::generate_tick_vector(Gcode::TabEtatMachine & tabetat) {
 	    first=false;
 	    iter++;
 	}
-	Accel_vectors.push_back(new Accel_vector(0,0,0,0,epoch_present,epoch_present+1000));//empty end vector
-	Accel_vectors.push_back(new Accel_vector(0,0,0,0,epoch_present+1000,epoch_present+2000));//empty end vector
+	Accel_vectors.push_back(new Accel_vector(0,0,0,0,epoch_present,epoch_present+100));//empty end vector
+	Accel_vectors.push_back(new Accel_vector(0,0,0,0,epoch_present+1000,epoch_present+200));//empty end vector
 	cout << " Done" << endl;
 	return false;
 }
