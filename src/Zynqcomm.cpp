@@ -15,6 +15,7 @@ Zynq_comm::Zynq_comm(bool simulate) : Simulation_mode(simulate)
                 perror("cannot comunicate with zynq");
                 exit(-1);
         }
+        send_reset_FPGA();
       }
         else
         {
@@ -71,7 +72,10 @@ void Zynq_comm::execute_reset_off()
 
 void Zynq_comm::send_reset_FPGA()
 {
-
+    if(Simulation_mode==false)
+    {
+        generator_addr[R_control]=(1<<bit_resetpos);
+    }
 }
 
 unsigned int Zynq_comm::get_fifo_fill()

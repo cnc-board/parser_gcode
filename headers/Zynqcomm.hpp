@@ -27,6 +27,7 @@
 #define R_position R_4
 #define bit_write_fifo 31
 #define bit_startcycle 30
+#define bit_resetpos 29
 
 class Zynq_comm {
 public:
