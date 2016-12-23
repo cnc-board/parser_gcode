@@ -86,6 +86,27 @@ unsigned int Zynq_comm::get_fifo_fill()
   }
 }
 
+Position_Vector Zynq_comm::get_axe_position()
+{
+  int32_t x,y,z,a;
+  if(Simulation_mode==false)
+  {
+      generator_addr[R_position]=0;
+      x=generator_addr[R_position];
+      generator_addr[R_position]=1;
+      y=generator_addr[R_position];
+      generator_addr[R_position]=2;
+      z=generator_addr[R_position];
+      generator_addr[R_position]=3;
+      a=generator_addr[R_position];
+      return Position_Vector(x,y,z,a);
+  }
+  else
+  {
+      return Position_Vector(posxdeb,0,0,0);
+  }
+}
+
 int Zynq_comm::check_comm()
 {
         return 0;
